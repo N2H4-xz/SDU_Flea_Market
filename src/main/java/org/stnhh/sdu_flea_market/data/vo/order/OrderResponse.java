@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class OrderResponse {
     private String order_id;
     private String product_id;
+    private String product_title; // 商品标题（用于列表显示）
     private String buyer_id;
     private String seller_id;
     private BigDecimal amount;

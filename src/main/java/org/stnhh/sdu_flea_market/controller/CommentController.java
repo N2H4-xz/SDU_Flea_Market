@@ -27,9 +27,9 @@ public class CommentController {
             String token = TokenUtil.extractToken(httpRequest);
             String authorId = extractUserIdFromToken(token);
 
-            // 创建评论
+            // 创建留言
             Comment comment = commentService.createComment(productId, authorId, request);
-            return ResponseUtil.build(Result.success(comment, "评论发布成功"));
+            return ResponseUtil.build(Result.success(comment, "留言发布成功"));
         } catch (Exception e) {
             return ResponseUtil.build(Result.error(400, e.getMessage()));
         }
@@ -57,7 +57,7 @@ public class CommentController {
             String token = TokenUtil.extractToken(httpRequest);
             String userId = extractUserIdFromToken(token);
 
-            // 删除评论
+            // 删除留言
             commentService.deleteComment(commentId, userId);
             return ResponseUtil.build(Result.ok());
         } catch (Exception e) {

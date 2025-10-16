@@ -16,13 +16,14 @@ import java.time.LocalDateTime;
 public class Recharge {
     @TableId(type = IdType.ASSIGN_UUID)
     private String rechargeId;
-    
+
     private String userId;
     private BigDecimal amount;
     private String status; // pending/completed/failed
     private String paymentMethod; // alipay/wechat/card
     private String paymentUrl;
-    
+    private String transactionId; // 第三方交易ID
+
     private LocalDateTime createdAt;
     private LocalDateTime completedAt;
     private LocalDateTime updatedAt;

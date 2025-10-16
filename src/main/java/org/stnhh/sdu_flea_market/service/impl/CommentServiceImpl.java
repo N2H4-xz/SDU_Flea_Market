@@ -38,12 +38,12 @@ public class CommentServiceImpl implements CommentService {
             throw new RuntimeException("商品不存在");
         }
 
-        // 验证评论内容不为空
+        // 验证留言内容不为空
         if (request.getContent() == null || request.getContent().trim().isEmpty()) {
-            throw new RuntimeException("评论内容不能为空");
+            throw new RuntimeException("留言内容不能为空");
         }
 
-        // 创建评论
+        // 创建留言
         Comment comment = new Comment();
         comment.setProductId(productId);
         comment.setAuthorId(authorId);
@@ -112,18 +112,18 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void deleteComment(String commentId, String userId) {
-        // 查询评论
+        // 查询留言
         Comment comment = commentMapper.selectById(commentId);
         if (comment == null) {
-            throw new RuntimeException("评论不存在");
+            throw new RuntimeException("留言不存在");
         }
 
-        // 验证用户权限：只有评论作者可以删除
+        // 验证用户权限：只有留言作者可以删除
         if (!comment.getAuthorId().equals(userId)) {
-            throw new RuntimeException("无权限删除此评论");
+            throw new RuntimeException("无权限删除此留言");
         }
 
-        // 删除评论
+        // 删除留言
         commentMapper.deleteById(commentId);
     }
 }

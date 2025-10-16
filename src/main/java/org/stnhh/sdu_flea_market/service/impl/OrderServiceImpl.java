@@ -162,6 +162,13 @@ public class OrderServiceImpl implements OrderService {
         response.setCreated_at(order.getCreatedAt());
         response.setPaid_at(order.getPaidAt());
         response.setCompleted_at(order.getCompletedAt());
+
+        // 获取商品标题
+        Product product = productMapper.selectById(order.getProductId());
+        if (product != null) {
+            response.setProduct_title(product.getTitle());
+        }
+
         return response;
     }
 }
