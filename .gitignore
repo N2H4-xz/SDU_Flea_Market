@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+application.yml
+*.yml
+*.yml
+src/main/resources/application.yml
+*.yml
