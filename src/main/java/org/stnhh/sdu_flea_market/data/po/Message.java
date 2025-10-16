@@ -15,12 +15,13 @@ import java.time.LocalDateTime;
 public class Message {
     @TableId(type = IdType.ASSIGN_UUID)
     private String messageId;
-    
+
     private String senderId;
     private String recipientId;
     private String content;
     private Boolean isRead;
-    
+    private LocalDateTime readAt; // 阅读时间
+
     private LocalDateTime createdAt;
 }
 

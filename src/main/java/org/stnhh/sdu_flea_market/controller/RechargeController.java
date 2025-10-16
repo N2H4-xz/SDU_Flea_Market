@@ -55,8 +55,8 @@ public class RechargeController {
     }
 
     private String extractUserIdFromToken(String token) {
-        // TODO: 需要实现JWT令牌解析，从令牌中提取用户ID
-        return "user_id_from_token";
+        // 使用TokenUtil中的方法提取用户ID
+        return TokenUtil.extractUserIdFromToken(token);
     }
 }
 

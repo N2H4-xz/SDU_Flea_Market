@@ -16,11 +16,12 @@ import java.time.LocalDateTime;
 public class UserWallet {
     @TableId(type = IdType.ASSIGN_UUID)
     private String walletId;
-    
+
     private String userId;
-    private BigDecimal balance;
-    private Integer version; // for optimistic locking
-    
+    private BigDecimal balance; // 账户余额
+    private BigDecimal totalRecharged; // 总充值金额
+    private BigDecimal totalSpent; // 总消费金额
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
