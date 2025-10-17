@@ -1,6 +1,5 @@
 package org.stnhh.sdu_flea_market.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +10,7 @@ import org.stnhh.sdu_flea_market.data.vo.recharge.RechargeRequest;
 import org.stnhh.sdu_flea_market.data.vo.recharge.RechargeResponse;
 import org.stnhh.sdu_flea_market.data.vo.PageResponse;
 import org.stnhh.sdu_flea_market.service.RechargeService;
-import org.stnhh.sdu_flea_market.utils.ResponseUtil;
+import org.stnhh.sdu_flea_market.utils.AuthContextUtil;
 
 @RestController
 @RequestMapping("/recharge")
@@ -22,10 +21,10 @@ public class RechargeController {
 
     @Auth
     @PostMapping
-    public ResponseEntity<Result> createRecharge(@RequestBody RechargeRequest request, HttpServletRequest httpRequest) {
+    public ResponseEntity<Result> createRecharge(@RequestBody RechargeRequest request) {
         try {
-            // 从请求属性中获取userId（由AuthAspect设置）
-            String userId = (String) httpRequest.getAttribute("userId");
+            // 从请求上下文中获取userId（由AuthAspect设置）
+            String userId = AuthContextUtil.getUserId();
 
             // 创建充值订单
             Recharge recharge = rechargeService.createRecharge(userId, request);
@@ -40,11 +39,10 @@ public class RechargeController {
     public ResponseEntity<Result> getRechargeHistory(
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "20") Integer limit,
-            @RequestParam(required = false) String status,
-            HttpServletRequest httpRequest) {
+            @RequestParam(required = false) String status) {
         try {
-            // 从请求属性中获取userId（由AuthAspect设置）
-            String userId = (String) httpRequest.getAttribute("userId");
+            // 从请求上下文中获取userId（由AuthAspect设置）
+            String userId = AuthContextUtil.getUserId();
 
             // 获取充值历史记录
             PageResponse<RechargeResponse> response = rechargeService.getRechargeHistory(userId, page, limit, status);

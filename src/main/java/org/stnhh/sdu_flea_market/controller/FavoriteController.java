@@ -1,6 +1,5 @@
 package org.stnhh.sdu_flea_market.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +10,7 @@ import org.stnhh.sdu_flea_market.data.vo.favorite.FavoriteRequest;
 import org.stnhh.sdu_flea_market.data.vo.favorite.FavoriteResponse;
 import org.stnhh.sdu_flea_market.data.vo.PageResponse;
 import org.stnhh.sdu_flea_market.service.FavoriteService;
-import org.stnhh.sdu_flea_market.utils.ResponseUtil;
+import org.stnhh.sdu_flea_market.utils.AuthContextUtil;
 
 @RestController
 @RequestMapping("/favorites")
@@ -22,10 +21,10 @@ public class FavoriteController {
 
     @Auth
     @PostMapping
-    public ResponseEntity<Result> addFavorite(@RequestBody FavoriteRequest request, HttpServletRequest httpRequest) {
+    public ResponseEntity<Result> addFavorite(@RequestBody FavoriteRequest request) {
         try {
-            // 从请求属性中获取userId（由AuthAspect设置）
-            String userId = (String) httpRequest.getAttribute("userId");
+            // 从请求上下文中获取userId（由AuthAspect设置）
+            String userId = AuthContextUtil.getUserId();
 
             // 添加收藏
             Favorite favorite = favoriteService.addFavorite(userId, request.getProduct_id());
@@ -37,10 +36,10 @@ public class FavoriteController {
 
     @Auth
     @DeleteMapping("/{productId}")
-    public ResponseEntity<Result> removeFavorite(@PathVariable String productId, HttpServletRequest httpRequest) {
+    public ResponseEntity<Result> removeFavorite(@PathVariable String productId) {
         try {
-            // 从请求属性中获取userId（由AuthAspect设置）
-            String userId = (String) httpRequest.getAttribute("userId");
+            // 从请求上下文中获取userId（由AuthAspect设置）
+            String userId = AuthContextUtil.getUserId();
 
             // 删除收藏
             favoriteService.removeFavorite(userId, productId);
@@ -54,11 +53,10 @@ public class FavoriteController {
     @GetMapping
     public ResponseEntity<Result> listFavorites(
             @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "20") Integer limit,
-            HttpServletRequest httpRequest) {
+            @RequestParam(defaultValue = "20") Integer limit) {
         try {
-            // 从请求属性中获取userId（由AuthAspect设置）
-            String userId = (String) httpRequest.getAttribute("userId");
+            // 从请求上下文中获取userId（由AuthAspect设置）
+            String userId = AuthContextUtil.getUserId();
 
             // 获取用户的收藏列表
             PageResponse<FavoriteResponse> response = favoriteService.listFavorites(userId, page, limit);
