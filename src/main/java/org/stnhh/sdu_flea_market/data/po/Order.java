@@ -14,12 +14,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @TableName("orders")
 public class Order {
-    @TableId(type = IdType.ASSIGN_UUID)
-    private String orderId;
-    
-    private String productId;
-    private String buyerId;
-    private String sellerId;
+    @TableId(type = IdType.AUTO)
+    private Long uid;
+
+    private Long productId;
+    private Long buyerId;
+    private Long sellerId;
     private BigDecimal amount;
     private String status; // pending_payment/paid/completed/cancelled
     private String paymentMethod; // online/offline

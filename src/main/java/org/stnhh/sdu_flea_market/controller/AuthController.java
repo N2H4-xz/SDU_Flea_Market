@@ -22,64 +22,47 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<Result> register(@RequestBody RegisterRequest request) {
-        try {
-            // 验证两次输入的密码是否一致
-            if (!request.getPassword().equals(request.getConfirm_password())) {
-                return Result.error(400, "两次密码不一致");
-            }
-
-            // 调用服务进行用户注册
-            User user = userService.register(request.getUsername(), request.getEmail(), request.getPassword());
-
-            return Result.success(user, "注册成功");
-        } catch (Exception e) {
-            return Result.error(400, e.getMessage());
+        // 验证两次输入的密码是否一致
+        if (!request.getPassword().equals(request.getConfirm_password())) {
+            return Result.error(400, "两次密码不一致");
         }
+        // 调用服务进行用户注册
+        User user = userService.register(request.getUsername(), request.getEmail(), request.getPassword());
+        return Result.success(user, "注册成功");
+
     }
 
     @PostMapping("/login")
     public ResponseEntity<Result> login(@RequestBody LoginRequest request) {
-        try {
-            // 调用服务进行用户登录
-            LoginResponse response = userService.login(request.getEmail(), request.getPassword());
-            return Result.success(response, "登录成功");
-        } catch (Exception e) {
-            return Result.error(401, e.getMessage());
-        }
+        // 调用服务进行用户登录（支持用户名或邮箱登录）
+        LoginResponse response = userService.login(request.getUsername(), request.getEmail(), request.getPassword());
+        return Result.success(response, "登录成功");
     }
 
     @Auth
     @PostMapping("/logout")
     public ResponseEntity<Result> logout() {
-        try {
-            // 从请求上下文中获取userId（由AuthAspect设置）
-            String userId = AuthContextUtil.getUserId();
-            // 调用服务进行登出
-            userService.logout(userId);
-            return Result.ok();
-        } catch (Exception e) {
-            return Result.error(400, e.getMessage());
-        }
+        // 从请求上下文中获取userId（由AuthAspect设置）
+        Long userId = AuthContextUtil.getUserId();
+        // 调用服务进行登出
+        userService.logout(userId);
+        return Result.ok();
     }
 
     @Auth
     @PostMapping("/change-password")
     public ResponseEntity<Result> changePassword(@RequestBody ChangePasswordRequest request) {
-        try {
-            // 从请求上下文中获取userId（由AuthAspect设置）
-            String userId = AuthContextUtil.getUserId();
+        // 从请求上下文中获取userId（由AuthAspect设置）
+        Long userId = AuthContextUtil.getUserId();
 
-            // 验证两次输入的新密码是否一致
-            if (!request.getNew_password().equals(request.getConfirm_password())) {
-                return Result.error(400, "两次新密码不一致");
-            }
-
-            // 调用服务修改密码
-            userService.changePassword(userId, request.getOld_password(), request.getNew_password());
-            return Result.ok();
-        } catch (Exception e) {
-            return Result.error(400, e.getMessage());
+        // 验证两次输入的新密码是否一致
+        if (!request.getNew_password().equals(request.getConfirm_password())) {
+            return Result.error(400, "两次新密码不一致");
         }
+
+        // 调用服务修改密码
+        userService.changePassword(userId, request.getOld_password(), request.getNew_password());
+        return Result.ok();
     }
 
 

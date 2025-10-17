@@ -10,11 +10,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderResponse {
-    private String order_id;
-    private String product_id;
+    private Long order_id;
+    private Long product_id;
     private String product_title; // 商品标题（用于列表显示）
-    private String buyer_id;
-    private String seller_id;
+    private Long buyer_id;
+    private Long seller_id;
     private BigDecimal amount;
     private String status;
     private String payment_method;

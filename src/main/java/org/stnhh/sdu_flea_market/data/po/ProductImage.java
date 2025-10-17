@@ -13,10 +13,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @TableName("product_images")
 public class ProductImage {
-    @TableId(type = IdType.ASSIGN_UUID)
-    private String imageId;
-    
-    private String productId;
+    @TableId(type = IdType.AUTO)
+    private Long uid;
+
+    private Long productId;
     private String imageUrl;
     private Boolean isThumbnail;
     private Integer sortOrder;

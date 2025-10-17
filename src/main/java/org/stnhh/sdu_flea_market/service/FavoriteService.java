@@ -5,8 +5,8 @@ import org.stnhh.sdu_flea_market.data.vo.favorite.FavoriteResponse;
 import org.stnhh.sdu_flea_market.data.vo.PageResponse;
 
 public interface FavoriteService {
-    Favorite addFavorite(String userId, String productId);
-    void removeFavorite(String userId, String productId);
-    PageResponse<FavoriteResponse> listFavorites(String userId, Integer page, Integer limit);
+    Favorite addFavorite(Long userId, Long productId);
+    void removeFavorite(Long userId, Long productId);
+    PageResponse<FavoriteResponse> listFavorites(Long userId, Integer page, Integer limit);
 }
 

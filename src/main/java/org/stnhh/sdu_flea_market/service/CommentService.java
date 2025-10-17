@@ -6,8 +6,8 @@ import org.stnhh.sdu_flea_market.data.vo.comment.CommentResponse;
 import org.stnhh.sdu_flea_market.data.vo.PageResponse;
 
 public interface CommentService {
-    Comment createComment(String productId, String authorId, CommentRequest request);
-    PageResponse<CommentResponse> listComments(String productId, Integer page, Integer limit, String sort);
-    void deleteComment(String commentId, String userId);
+    Comment createComment(Long productId, Long authorId, CommentRequest request);
+    PageResponse<CommentResponse> listComments(Long productId, Integer page, Integer limit, String sort);
+    void deleteComment(Long commentId, Long userId);
 }
 

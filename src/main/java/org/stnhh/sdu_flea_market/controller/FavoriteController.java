@@ -22,31 +22,23 @@ public class FavoriteController {
     @Auth
     @PostMapping
     public ResponseEntity<Result> addFavorite(@RequestBody FavoriteRequest request) {
-        try {
-            // 从请求上下文中获取userId（由AuthAspect设置）
-            String userId = AuthContextUtil.getUserId();
+        // 从请求上下文中获取userId（由AuthAspect设置）
+        Long userId = AuthContextUtil.getUserId();
 
-            // 添加收藏
-            Favorite favorite = favoriteService.addFavorite(userId, request.getProduct_id());
-            return Result.success(favorite, "收藏成功");
-        } catch (Exception e) {
-            return Result.error(400, e.getMessage());
-        }
+        // 添加收藏
+        Favorite favorite = favoriteService.addFavorite(userId, request.getProduct_id());
+        return Result.success(favorite, "收藏成功");
     }
 
     @Auth
     @DeleteMapping("/{productId}")
-    public ResponseEntity<Result> removeFavorite(@PathVariable String productId) {
-        try {
-            // 从请求上下文中获取userId（由AuthAspect设置）
-            String userId = AuthContextUtil.getUserId();
+    public ResponseEntity<Result> removeFavorite(@PathVariable Long productId) {
+        // 从请求上下文中获取userId（由AuthAspect设置）
+        Long userId = AuthContextUtil.getUserId();
 
-            // 删除收藏
-            favoriteService.removeFavorite(userId, productId);
-            return Result.ok();
-        } catch (Exception e) {
-            return Result.error(400, e.getMessage());
-        }
+        // 删除收藏
+        favoriteService.removeFavorite(userId, productId);
+        return Result.ok();
     }
 
     @Auth
@@ -54,16 +46,12 @@ public class FavoriteController {
     public ResponseEntity<Result> listFavorites(
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "20") Integer limit) {
-        try {
-            // 从请求上下文中获取userId（由AuthAspect设置）
-            String userId = AuthContextUtil.getUserId();
+        // 从请求上下文中获取userId（由AuthAspect设置）
+        Long userId = AuthContextUtil.getUserId();
 
-            // 获取用户的收藏列表
-            PageResponse<FavoriteResponse> response = favoriteService.listFavorites(userId, page, limit);
-            return Result.success(response, "获取成功");
-        } catch (Exception e) {
-            return Result.error(400, e.getMessage());
-        }
+        // 获取用户的收藏列表
+        PageResponse<FavoriteResponse> response = favoriteService.listFavorites(userId, page, limit);
+        return Result.success(response, "获取成功");
     }
 }
 

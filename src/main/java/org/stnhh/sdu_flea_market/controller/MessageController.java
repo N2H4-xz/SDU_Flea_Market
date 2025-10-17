@@ -20,19 +20,15 @@ public class MessageController {
     @Auth
     @GetMapping("/{userId}")
     public ResponseEntity<Result> getMessageHistory(
-            @PathVariable String userId,
+            @PathVariable Long userId,
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "50") Integer limit) {
-        try {
-            // 从请求上下文中获取userId（由AuthAspect设置）
-            String currentUserId = AuthContextUtil.getUserId();
+        // 从请求上下文中获取userId（由AuthAspect设置）
+        Long currentUserId = AuthContextUtil.getUserId();
 
-            // 获取消息历史记录
-            PageResponse<MessageResponse> response = messageService.getMessageHistory(currentUserId, userId, page, limit);
-            return Result.success(response, "获取成功");
-        } catch (Exception e) {
-            return Result.error(400, e.getMessage());
-        }
+        // 获取消息历史记录
+        PageResponse<MessageResponse> response = messageService.getMessageHistory(currentUserId, userId, page, limit);
+        return Result.success(response, "获取成功");
     }
 }
 

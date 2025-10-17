@@ -25,7 +25,7 @@ public class FavoriteServiceImpl implements FavoriteService {
     private ProductMapper productMapper;
 
     @Override
-    public Favorite addFavorite(String userId, String productId) {
+    public Favorite addFavorite(Long userId, Long productId) {
         // 验证商品是否存在且未被删除
         Product product = productMapper.selectById(productId);
         if (product == null || product.getIsDeleted()) {
@@ -50,7 +50,7 @@ public class FavoriteServiceImpl implements FavoriteService {
     }
 
     @Override
-    public void removeFavorite(String userId, String productId) {
+    public void removeFavorite(Long userId, Long productId) {
         // 检查收藏是否存在
         QueryWrapper<Favorite> wrapper = new QueryWrapper<>();
         wrapper.eq("user_id", userId).eq("product_id", productId);
@@ -63,7 +63,7 @@ public class FavoriteServiceImpl implements FavoriteService {
     }
 
     @Override
-    public PageResponse<FavoriteResponse> listFavorites(String userId, Integer page, Integer limit) {
+    public PageResponse<FavoriteResponse> listFavorites(Long userId, Integer page, Integer limit) {
         QueryWrapper<Favorite> wrapper = new QueryWrapper<>();
         wrapper.eq("user_id", userId).orderByDesc("created_at");
 
@@ -71,7 +71,7 @@ public class FavoriteServiceImpl implements FavoriteService {
 
         List<FavoriteResponse> items = pageResult.getRecords().stream().map(favorite -> {
             FavoriteResponse response = new FavoriteResponse();
-            response.setFavorite_id(favorite.getFavoriteId());
+            response.setFavorite_id(favorite.getUid());
             response.setProduct_id(favorite.getProductId());
             response.setCreated_at(favorite.getCreatedAt());
             return response;

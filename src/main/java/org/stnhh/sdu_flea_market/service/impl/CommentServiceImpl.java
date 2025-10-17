@@ -31,7 +31,7 @@ public class CommentServiceImpl implements CommentService {
     private UserMapper userMapper;
 
     @Override
-    public Comment createComment(String productId, String authorId, CommentRequest request) {
+    public Comment createComment(Long productId, Long authorId, CommentRequest request) {
         // 验证商品是否存在且未被删除
         Product product = productMapper.selectById(productId);
         if (product == null || product.getIsDeleted()) {
@@ -56,7 +56,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public PageResponse<CommentResponse> listComments(String productId, Integer page, Integer limit, String sort) {
+    public PageResponse<CommentResponse> listComments(Long productId, Integer page, Integer limit, String sort) {
         // 验证商品是否存在且未被删除
         Product product = productMapper.selectById(productId);
         if (product == null || product.getIsDeleted()) {
@@ -82,7 +82,7 @@ public class CommentServiceImpl implements CommentService {
         // 转换为响应对象列表
         List<CommentResponse> items = pageResult.getRecords().stream().map(comment -> {
             CommentResponse response = new CommentResponse();
-            response.setComment_id(comment.getCommentId());
+            response.setComment_id(comment.getUid());
             response.setProduct_id(comment.getProductId());
             response.setContent(comment.getContent());
             response.setCreated_at(comment.getCreatedAt());
@@ -91,7 +91,7 @@ public class CommentServiceImpl implements CommentService {
             User author = userMapper.selectById(comment.getAuthorId());
             if (author != null) {
                 CommentResponse.AuthorInfo authorInfo = new CommentResponse.AuthorInfo();
-                authorInfo.setUser_id(author.getUserId());
+                authorInfo.setUser_id(author.getUid());
                 authorInfo.setNickname(author.getNickname());
                 authorInfo.setAvatar(author.getAvatar());
                 response.setAuthor(authorInfo);
@@ -111,7 +111,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void deleteComment(String commentId, String userId) {
+    public void deleteComment(Long commentId, Long userId) {
         // 查询留言
         Comment comment = commentMapper.selectById(commentId);
         if (comment == null) {

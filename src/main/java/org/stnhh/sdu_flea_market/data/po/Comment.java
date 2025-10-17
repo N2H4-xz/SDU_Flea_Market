@@ -13,11 +13,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @TableName("comments")
 public class Comment {
-    @TableId(type = IdType.ASSIGN_UUID)
-    private String commentId;
-    
-    private String productId;
-    private String authorId;
+    @TableId(type = IdType.AUTO)
+    private Long uid;
+
+    private Long productId;
+    private Long authorId;
     private String content;
     
     private LocalDateTime createdAt;

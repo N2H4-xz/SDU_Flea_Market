@@ -23,16 +23,12 @@ public class ProductController {
     @Auth
     @PostMapping
     public ResponseEntity<Result> createProduct(@RequestBody ProductRequest request) {
-        try {
-            // 从请求上下文中获取userId（由AuthAspect设置）
-            String sellerId = AuthContextUtil.getUserId();
+        // 从请求上下文中获取userId（由AuthAspect设置）
+        Long sellerId = AuthContextUtil.getUserId();
 
-            // 创建商品
-            Product product = productService.createProduct(sellerId, request);
-            return Result.success(product, "商品发布成功");
-        } catch (Exception e) {
-            return Result.error(400, e.getMessage());
-        }
+        // 创建商品
+        Product product = productService.createProduct(sellerId, request);
+        return Result.success(product, "商品发布成功");
     }
 
     @GetMapping
@@ -44,54 +40,38 @@ public class ProductController {
             @RequestParam(required = false) String campus,
             @RequestParam(defaultValue = "newest") String sort,
             @RequestParam(required = false) String condition) {
-        try {
-            // 获取商品列表
-            PageResponse<ProductListResponse> response = productService.listProducts(page, limit, keyword, category, campus, sort, condition);
-            return Result.success(response, "获取成功");
-        } catch (Exception e) {
-            return Result.error(400, e.getMessage());
-        }
+        // 获取商品列表
+        PageResponse<ProductListResponse> response = productService.listProducts(page, limit, keyword, category, campus, sort, condition);
+        return Result.success(response, "获取成功");
     }
 
     @GetMapping("/{productId}")
-    public ResponseEntity<Result> getProductDetail(@PathVariable String productId) {
-        try {
-            // 获取商品详情
-            ProductResponse response = productService.getProductDetail(productId);
-            return Result.success(response, "获取成功");
-        } catch (Exception e) {
-            return Result.error(404, e.getMessage());
-        }
+    public ResponseEntity<Result> getProductDetail(@PathVariable Long productId) {
+        // 获取商品详情
+        ProductResponse response = productService.getProductDetail(productId);
+        return Result.success(response, "获取成功");
     }
 
     @Auth
     @PutMapping("/{productId}")
-    public ResponseEntity<Result> updateProduct(@PathVariable String productId, @RequestBody ProductRequest request) {
-        try {
-            // 从请求上下文中获取userId（由AuthAspect设置）
-            String sellerId = AuthContextUtil.getUserId();
+    public ResponseEntity<Result> updateProduct(@PathVariable Long productId, @RequestBody ProductRequest request) {
+        // 从请求上下文中获取userId（由AuthAspect设置）
+        Long sellerId = AuthContextUtil.getUserId();
 
-            // 更新商品信息
-            ProductResponse response = productService.updateProduct(productId, sellerId, request);
-            return Result.success(response, "商品更新成功");
-        } catch (Exception e) {
-            return Result.error(400, e.getMessage());
-        }
+        // 更新商品信息
+        ProductResponse response = productService.updateProduct(productId, sellerId, request);
+        return Result.success(response, "商品更新成功");
     }
 
     @Auth
     @DeleteMapping("/{productId}")
-    public ResponseEntity<Result> deleteProduct(@PathVariable String productId) {
-        try {
-            // 从请求上下文中获取userId（由AuthAspect设置）
-            String sellerId = AuthContextUtil.getUserId();
+    public ResponseEntity<Result> deleteProduct(@PathVariable Long productId) {
+        // 从请求上下文中获取userId（由AuthAspect设置）
+        Long sellerId = AuthContextUtil.getUserId();
 
-            // 删除商品
-            productService.deleteProduct(productId, sellerId);
-            return Result.ok();
-        } catch (Exception e) {
-            return Result.error(400, e.getMessage());
-        }
+        // 删除商品
+        productService.deleteProduct(productId, sellerId);
+        return Result.ok();
     }
 }
 

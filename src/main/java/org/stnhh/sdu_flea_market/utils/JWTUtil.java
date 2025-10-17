@@ -42,18 +42,16 @@ public class JWTUtil {
     public static final int EXPIRE_TIME = 1800;//Token过期时间
     public static final int REFRESH_EXPIRE_TIME = 2 * 60 *60;//RefreshToken过期时间
 
-    //生成token
-    public String getToken(String accountId, int expireTime, String key) {
+    //生成token - 支持 Long 类型的 userId
+    public String getToken(Long accountId, int expireTime, String key) {
         try {
-            Map<String, String> map = new HashMap<>();
-            map.put("user_id", accountId);
             //获取时间，设置token过期时间
             Calendar instance = Calendar.getInstance();
             instance.add(Calendar.SECOND, expireTime);
 
             //JWT添加payload
             JWTCreator.Builder builder = JWT.create();
-            map.forEach(builder::withClaim);
+            builder.withClaim("user_id", accountId);
 
             //JWT过期时间 + signature
             String token = builder.withExpiresAt(instance.getTime()).sign(Algorithm.HMAC256(key));
@@ -70,8 +68,8 @@ public class JWTUtil {
         return JWT.require(Algorithm.HMAC256(key)).build().verify(token);
     }
 
-    // 获取用户 ID
-    public String getUserId(String token, String key) {
+    // 获取用户 ID - 返回 Long 类型
+    public Long getUserId(String token, String key) {
         try {
             if (redis.get(token) == null) {
                 throw new IllegalArgumentException();
@@ -82,7 +80,7 @@ public class JWTUtil {
                     .verify(token);
 
             // 提取用户 ID
-            return decodedJWT.getClaim("user_id").asString();
+            return decodedJWT.getClaim("user_id").asLong();
 
         } catch (TokenExpiredException e) {
             // Token 过期

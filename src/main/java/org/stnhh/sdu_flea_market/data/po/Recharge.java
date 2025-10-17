@@ -14,10 +14,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @TableName("recharges")
 public class Recharge {
-    @TableId(type = IdType.ASSIGN_UUID)
-    private String rechargeId;
+    @TableId(type = IdType.AUTO)
+    private Long uid;
 
-    private String userId;
+    private Long userId;
     private BigDecimal amount;
     private String status; // pending/completed/failed
     private String paymentMethod; // alipay/wechat/card

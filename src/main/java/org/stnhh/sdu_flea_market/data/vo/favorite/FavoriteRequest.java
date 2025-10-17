@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FavoriteRequest {
-    private String product_id;
+    private Long product_id;
 }
 

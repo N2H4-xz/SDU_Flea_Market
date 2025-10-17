@@ -13,11 +13,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @TableName("messages")
 public class Message {
-    @TableId(type = IdType.ASSIGN_UUID)
-    private String messageId;
+    @TableId(type = IdType.AUTO)
+    private Long uid;
 
-    private String senderId;
-    private String recipientId;
+    private Long senderId;
+    private Long recipientId;
     private String content;
     private Boolean isRead;
     private LocalDateTime readAt; // 阅读时间

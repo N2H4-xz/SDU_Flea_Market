@@ -22,16 +22,12 @@ public class RechargeController {
     @Auth
     @PostMapping
     public ResponseEntity<Result> createRecharge(@RequestBody RechargeRequest request) {
-        try {
-            // 从请求上下文中获取userId（由AuthAspect设置）
-            String userId = AuthContextUtil.getUserId();
+        // 从请求上下文中获取userId（由AuthAspect设置）
+        Long userId = AuthContextUtil.getUserId();
 
-            // 创建充值订单
-            Recharge recharge = rechargeService.createRecharge(userId, request);
-            return Result.success(recharge, "充值订单创建成功");
-        } catch (Exception e) {
-            return Result.error(400, e.getMessage());
-        }
+        // 创建充值订单
+        Recharge recharge = rechargeService.createRecharge(userId, request);
+        return Result.success(recharge, "充值订单创建成功");
     }
 
     @Auth
@@ -40,16 +36,12 @@ public class RechargeController {
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "20") Integer limit,
             @RequestParam(required = false) String status) {
-        try {
-            // 从请求上下文中获取userId（由AuthAspect设置）
-            String userId = AuthContextUtil.getUserId();
+        // 从请求上下文中获取userId（由AuthAspect设置）
+        Long userId = AuthContextUtil.getUserId();
 
-            // 获取充值历史记录
-            PageResponse<RechargeResponse> response = rechargeService.getRechargeHistory(userId, page, limit, status);
-            return Result.success(response, "获取成功");
-        } catch (Exception e) {
-            return Result.error(400, e.getMessage());
-        }
+        // 获取充值历史记录
+        PageResponse<RechargeResponse> response = rechargeService.getRechargeHistory(userId, page, limit, status);
+        return Result.success(response, "获取成功");
     }
 }
 

@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CommentResponse {
-    private String comment_id;
-    private String product_id;
+    private Long comment_id;
+    private Long product_id;
     private AuthorInfo author;
     private String content;
     private LocalDateTime created_at;
@@ -19,7 +19,7 @@ public class CommentResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class AuthorInfo {
-        private String user_id;
+        private Long user_id;
         private String nickname;
         private String avatar;
     }

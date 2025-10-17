@@ -23,16 +23,12 @@ public class OrderController {
     @Auth
     @PostMapping
     public ResponseEntity<Result> createOrder(@RequestBody OrderRequest request) {
-        try {
-            // 从请求上下文中获取userId（由AuthAspect设置）
-            String buyerId = AuthContextUtil.getUserId();
+        // 从请求上下文中获取userId（由AuthAspect设置）
+        Long buyerId = AuthContextUtil.getUserId();
 
-            // 创建订单
-            Order order = orderService.createOrder(buyerId, request);
-            return Result.success(order, "订单创建成功");
-        } catch (Exception e) {
-            return Result.error(400, e.getMessage());
-        }
+        // 创建订单
+        Order order = orderService.createOrder(buyerId, request);
+        return Result.success(order, "订单创建成功");
     }
 
     @Auth
@@ -42,46 +38,34 @@ public class OrderController {
             @RequestParam(defaultValue = "20") Integer limit,
             @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "buyer") String role) {
-        try {
-            // 从请求上下文中获取userId（由AuthAspect设置）
-            String userId = AuthContextUtil.getUserId();
+        // 从请求上下文中获取userId（由AuthAspect设置）
+        Long userId = AuthContextUtil.getUserId();
 
-            // 获取订单列表
-            PageResponse<OrderResponse> response = orderService.listOrders(userId, page, limit, status, role);
-            return Result.success(response, "获取成功");
-        } catch (Exception e) {
-            return Result.error(400, e.getMessage());
-        }
+        // 获取订单列表
+        PageResponse<OrderResponse> response = orderService.listOrders(userId, page, limit, status, role);
+        return Result.success(response, "获取成功");
     }
 
     @Auth
     @GetMapping("/{orderId}")
-    public ResponseEntity<Result> getOrderDetail(@PathVariable String orderId) {
-        try {
-            // 从请求上下文中获取userId（由AuthAspect设置）
-            String userId = AuthContextUtil.getUserId();
+    public ResponseEntity<Result> getOrderDetail(@PathVariable Long orderId) {
+        // 从请求上下文中获取userId（由AuthAspect设置）
+        Long userId = AuthContextUtil.getUserId();
 
-            // 获取订单详情
-            OrderResponse response = orderService.getOrderDetail(orderId, userId);
-            return Result.success(response, "获取成功");
-        } catch (Exception e) {
-            return Result.error(404, e.getMessage());
-        }
+        // 获取订单详情
+        OrderResponse response = orderService.getOrderDetail(orderId, userId);
+        return Result.success(response, "获取成功");
     }
 
     @Auth
     @PatchMapping("/{orderId}/status")
-    public ResponseEntity<Result> updateOrderStatus(@PathVariable String orderId, @RequestBody OrderStatusUpdateRequest request) {
-        try {
-            // 从请求上下文中获取userId（由AuthAspect设置）
-            String userId = AuthContextUtil.getUserId();
+    public ResponseEntity<Result> updateOrderStatus(@PathVariable Long orderId, @RequestBody OrderStatusUpdateRequest request) {
+        // 从请求上下文中获取userId（由AuthAspect设置）
+        Long userId = AuthContextUtil.getUserId();
 
-            // 更新订单状态
-            OrderResponse response = orderService.updateOrderStatus(orderId, userId, request.getStatus());
-            return Result.success(response, "订单状态更新成功");
-        } catch (Exception e) {
-            return Result.error(400, e.getMessage());
-        }
+        // 更新订单状态
+        OrderResponse response = orderService.updateOrderStatus(orderId, userId, request.getStatus());
+        return Result.success(response, "订单状态更新成功");
     }
 }
 

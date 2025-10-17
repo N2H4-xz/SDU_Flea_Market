@@ -20,31 +20,23 @@ public class UserController {
     @Auth
     @GetMapping("/profile")
     public ResponseEntity<Result> getProfile() {
-        try {
-            // 从请求上下文中获取userId（由AuthAspect设置）
-            String userId = AuthContextUtil.getUserId();
+        // 从请求上下文中获取userId（由AuthAspect设置）
+        Long userId = AuthContextUtil.getUserId();
 
-            // 获取用户个人资料
-            UserProfileResponse profile = userService.getProfile(userId);
-            return Result.success(profile, "获取成功");
-        } catch (Exception e) {
-            return Result.error(400, e.getMessage());
-        }
+        // 获取用户个人资料
+        UserProfileResponse profile = userService.getProfile(userId);
+        return Result.success(profile, "获取成功");
     }
 
     @Auth
     @PutMapping("/profile")
     public ResponseEntity<Result> updateProfile(@RequestBody UpdateProfileRequest request) {
-        try {
-            // 从请求上下文中获取userId（由AuthAspect设置）
-            String userId = AuthContextUtil.getUserId();
+        // 从请求上下文中获取userId（由AuthAspect设置）
+        Long userId = AuthContextUtil.getUserId();
 
-            // 更新用户个人资料
-            UserProfileResponse profile = userService.updateProfile(userId, request);
-            return Result.success(profile, "更新成功");
-        } catch (Exception e) {
-            return Result.error(400, e.getMessage());
-        }
+        // 更新用户个人资料
+        UserProfileResponse profile = userService.updateProfile(userId, request);
+        return Result.success(profile, "更新成功");
     }
 }
 

@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FavoriteResponse {
-    private String favorite_id;
-    private String product_id;
+    private Long favorite_id;
+    private Long product_id;
     private LocalDateTime created_at;
 }
 

@@ -21,7 +21,7 @@ public class RechargeServiceImpl implements RechargeService {
     private RechargeMapper rechargeMapper;
 
     @Override
-    public Recharge createRecharge(String userId, RechargeRequest request) {
+    public Recharge createRecharge(Long userId, RechargeRequest request) {
         Recharge recharge = new Recharge();
         recharge.setUserId(userId);
         recharge.setAmount(request.getAmount());
@@ -37,7 +37,7 @@ public class RechargeServiceImpl implements RechargeService {
     }
 
     @Override
-    public PageResponse<RechargeResponse> getRechargeHistory(String userId, Integer page, Integer limit, String status) {
+    public PageResponse<RechargeResponse> getRechargeHistory(Long userId, Integer page, Integer limit, String status) {
         QueryWrapper<Recharge> wrapper = new QueryWrapper<>();
         wrapper.eq("user_id", userId);
 
@@ -51,7 +51,7 @@ public class RechargeServiceImpl implements RechargeService {
 
         List<RechargeResponse> items = pageResult.getRecords().stream().map(recharge -> {
             RechargeResponse response = new RechargeResponse();
-            response.setRecharge_id(recharge.getRechargeId());
+            response.setRecharge_id(recharge.getUid());
             response.setAmount(recharge.getAmount());
             response.setStatus(recharge.getStatus());
             response.setPayment_method(recharge.getPaymentMethod());

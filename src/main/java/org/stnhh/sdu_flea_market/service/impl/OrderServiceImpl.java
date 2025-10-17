@@ -26,7 +26,7 @@ public class OrderServiceImpl implements OrderService {
     private ProductMapper productMapper;
 
     @Override
-    public Order createOrder(String buyerId, OrderRequest request) {
+    public Order createOrder(Long buyerId, OrderRequest request) {
         // 验证商品是否存在且未被删除
         Product product = productMapper.selectById(request.getProduct_id());
         if (product == null || product.getIsDeleted()) {
@@ -55,7 +55,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderResponse getOrderDetail(String orderId, String userId) {
+    public OrderResponse getOrderDetail(Long orderId, Long userId) {
         Order order = orderMapper.selectById(orderId);
         if (order == null) {
             throw new RuntimeException("订单不存在");
@@ -70,7 +70,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public PageResponse<OrderResponse> listOrders(String userId, Integer page, Integer limit, String status, String role) {
+    public PageResponse<OrderResponse> listOrders(Long userId, Integer page, Integer limit, String status, String role) {
         QueryWrapper<Order> wrapper = new QueryWrapper<>();
 
         if ("buyer".equals(role)) {
@@ -103,7 +103,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderResponse updateOrderStatus(String orderId, String userId, String newStatus) {
+    public OrderResponse updateOrderStatus(Long orderId, Long userId, String newStatus) {
         // 查询订单
         Order order = orderMapper.selectById(orderId);
         if (order == null) {
@@ -152,7 +152,7 @@ public class OrderServiceImpl implements OrderService {
 
     private OrderResponse convertToResponse(Order order) {
         OrderResponse response = new OrderResponse();
-        response.setOrder_id(order.getOrderId());
+        response.setOrder_id(order.getUid());
         response.setProduct_id(order.getProductId());
         response.setBuyer_id(order.getBuyerId());
         response.setSeller_id(order.getSellerId());

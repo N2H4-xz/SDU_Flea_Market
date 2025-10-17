@@ -4,6 +4,6 @@ import org.stnhh.sdu_flea_market.data.vo.message.MessageResponse;
 import org.stnhh.sdu_flea_market.data.vo.PageResponse;
 
 public interface MessageService {
-    PageResponse<MessageResponse> getMessageHistory(String userId, String otherUserId, Integer page, Integer limit);
+    PageResponse<MessageResponse> getMessageHistory(Long userId, Long otherUserId, Integer page, Integer limit);
 }
 

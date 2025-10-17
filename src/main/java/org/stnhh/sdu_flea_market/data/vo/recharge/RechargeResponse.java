@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RechargeResponse {
-    private String recharge_id;
+    private Long recharge_id;
     private BigDecimal amount;
     private String status;
     private String payment_method;

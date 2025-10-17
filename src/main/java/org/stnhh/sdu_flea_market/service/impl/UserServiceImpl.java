@@ -59,23 +59,31 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public LoginResponse login(String email, String password) {
-        // 根据邮箱查询用户
+    public LoginResponse login(String username, String email, String password) {
+        // 优先使用用户名登录，如果没有提供用户名则使用邮箱
         QueryWrapper<User> wrapper = new QueryWrapper<>();
-        wrapper.eq("email", email);
+
+        if (username != null && !username.trim().isEmpty()) {
+            wrapper.eq("username", username);
+        } else if (email != null && !email.trim().isEmpty()) {
+            wrapper.eq("email", email);
+        } else {
+            throw new RuntimeException("用户名或邮箱不能为空");
+        }
+
         User user = userMapper.selectOne(wrapper);
 
         // 验证用户存在且密码正确
         if (user == null || !BCrypt.checkpw(password, user.getPasswordHash())) {
-            throw new RuntimeException("邮箱或密码错误");
+            throw new RuntimeException("用户名/邮箱或密码错误");
         }
 
         // 生成JWT令牌
-        String token = jwtUtil.getToken(user.getUserId(), JWTUtil.EXPIRE_TIME, "STPlayTableSecretKey");
+        String token = jwtUtil.getToken(user.getUid(), JWTUtil.EXPIRE_TIME, "STPlayTableSecretKey");
 
         // 构建登录响应
         LoginResponse response = new LoginResponse();
-        response.setUser_id(user.getUserId());
+        response.setUser_id(user.getUid());
         response.setUsername(user.getUsername());
         response.setEmail(user.getEmail());
         response.setToken(token);
@@ -85,19 +93,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserById(String userId) {
+    public User getUserById(Long userId) {
         return userMapper.selectById(userId);
     }
 
     @Override
-    public UserProfileResponse getProfile(String userId) {
+    public UserProfileResponse getProfile(Long userId) {
         User user = userMapper.selectById(userId);
         if (user == null) {
             throw new RuntimeException("用户不存在");
         }
 
         UserProfileResponse response = new UserProfileResponse();
-        response.setUser_id(user.getUserId());
+        response.setUser_id(user.getUid());
         response.setUsername(user.getUsername());
         response.setEmail(user.getEmail());
         response.setAvatar(user.getAvatar());
@@ -114,7 +122,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserProfileResponse updateProfile(String userId, UpdateProfileRequest request) {
+    public UserProfileResponse updateProfile(Long userId, UpdateProfileRequest request) {
         User user = userMapper.selectById(userId);
         if (user == null) {
             throw new RuntimeException("用户不存在");
@@ -135,7 +143,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void changePassword(String userId, String oldPassword, String newPassword) {
+    public void changePassword(Long userId, String oldPassword, String newPassword) {
         User user = userMapper.selectById(userId);
         if (user == null) {
             throw new RuntimeException("用户不存在");
@@ -151,8 +159,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void logout(String token) {
-        cache.expire(token, 0);
+    public void logout(Long userId) {
+        // 登出逻辑：可以在这里清除用户的 token 或其他会话信息
+        // 由于 token 已经由 AuthAspect 处理，这里可以是空实现或记录日志
     }
 }
 

@@ -32,7 +32,7 @@ public class ProductServiceImpl implements ProductService {
     private UserMapper userMapper;
 
     @Override
-    public Product createProduct(String sellerId, ProductRequest request) {
+    public Product createProduct(Long sellerId, ProductRequest request) {
         Product product = new Product();
         product.setSellerId(sellerId);
         product.setTitle(request.getTitle());
@@ -52,7 +52,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse getProductDetail(String productId) {
+    public ProductResponse getProductDetail(Long productId) {
         // 查询商品信息
         Product product = productMapper.selectById(productId);
         if (product == null || product.getIsDeleted()) {
@@ -73,7 +73,7 @@ public class ProductServiceImpl implements ProductService {
 
         // 构建商品详情响应
         ProductResponse response = new ProductResponse();
-        response.setProduct_id(product.getProductId());
+        response.setProduct_id(product.getUid());
         response.setTitle(product.getTitle());
         response.setDescription(product.getDescription());
         response.setPrice(product.getPrice());
@@ -89,7 +89,7 @@ public class ProductServiceImpl implements ProductService {
         // 设置卖家信息
         if (seller != null) {
             ProductResponse.SellerInfo sellerInfo = new ProductResponse.SellerInfo();
-            sellerInfo.setUser_id(seller.getUserId());
+            sellerInfo.setUser_id(seller.getUid());
             sellerInfo.setNickname(seller.getNickname());
             sellerInfo.setAvatar(seller.getAvatar());
             sellerInfo.setCampus(seller.getCampus());
@@ -141,7 +141,7 @@ public class ProductServiceImpl implements ProductService {
         // 转换为响应对象列表
         List<ProductListResponse> items = pageResult.getRecords().stream().map(product -> {
             ProductListResponse item = new ProductListResponse();
-            item.setProduct_id(product.getProductId());
+            item.setProduct_id(product.getUid());
             item.setTitle(product.getTitle());
             item.setPrice(product.getPrice());
             item.setCondition(product.getCondition());
@@ -152,7 +152,7 @@ public class ProductServiceImpl implements ProductService {
 
             // 获取商品缩略图
             QueryWrapper<ProductImage> imageWrapper = new QueryWrapper<>();
-            imageWrapper.eq("product_id", product.getProductId()).eq("is_thumbnail", true);
+            imageWrapper.eq("product_id", product.getUid()).eq("is_thumbnail", true);
             ProductImage thumbnail = productImageMapper.selectOne(imageWrapper);
             if (thumbnail != null) {
                 item.setThumbnail(thumbnail.getImageUrl());
@@ -161,7 +161,7 @@ public class ProductServiceImpl implements ProductService {
             // 获取卖家昵称
             User seller = userMapper.selectById(product.getSellerId());
             if (seller != null) {
-                item.setSeller_id(seller.getUserId());
+                item.setSeller_id(seller.getUid());
                 item.setSeller_nickname(seller.getNickname());
             }
 
@@ -179,7 +179,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse updateProduct(String productId, String sellerId, ProductRequest request) {
+    public ProductResponse updateProduct(Long productId, Long sellerId, ProductRequest request) {
         Product product = productMapper.selectById(productId);
         if (product == null || !product.getSellerId().equals(sellerId)) {
             throw new RuntimeException("无权限修改此商品");
@@ -199,7 +199,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void deleteProduct(String productId, String sellerId) {
+    public void deleteProduct(Long productId, Long sellerId) {
         Product product = productMapper.selectById(productId);
         if (product == null || !product.getSellerId().equals(sellerId)) {
             throw new RuntimeException("无权限删除此商品");

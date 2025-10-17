@@ -19,7 +19,7 @@ public class MessageServiceImpl implements MessageService {
     private MessageMapper messageMapper;
 
     @Override
-    public PageResponse<MessageResponse> getMessageHistory(String userId, String otherUserId, Integer page, Integer limit) {
+    public PageResponse<MessageResponse> getMessageHistory(Long userId, Long otherUserId, Integer page, Integer limit) {
         QueryWrapper<Message> wrapper = new QueryWrapper<>();
         wrapper.and(w -> w.eq("sender_id", userId).eq("recipient_id", otherUserId)
                 .or()
@@ -30,7 +30,7 @@ public class MessageServiceImpl implements MessageService {
 
         List<MessageResponse> items = pageResult.getRecords().stream().map(message -> {
             MessageResponse response = new MessageResponse();
-            response.setMessage_id(message.getMessageId());
+            response.setMessage_id(message.getUid());
             response.setSender_id(message.getSenderId());
             response.setRecipient_id(message.getRecipientId());
             response.setContent(message.getContent());

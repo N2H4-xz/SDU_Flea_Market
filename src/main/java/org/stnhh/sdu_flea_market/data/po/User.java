@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @TableName("users")
 public class User {
-    @TableId(type = IdType.ASSIGN_UUID)
-    private String userId;
+    @TableId(type = IdType.AUTO)
+    private Long uid;
     
     private String username;
     private String email;

@@ -6,9 +6,9 @@ import org.stnhh.sdu_flea_market.data.vo.order.OrderResponse;
 import org.stnhh.sdu_flea_market.data.vo.PageResponse;
 
 public interface OrderService {
-    Order createOrder(String buyerId, OrderRequest request);
-    OrderResponse getOrderDetail(String orderId, String userId);
-    PageResponse<OrderResponse> listOrders(String userId, Integer page, Integer limit, String status, String role);
-    OrderResponse updateOrderStatus(String orderId, String userId, String newStatus);
+    Order createOrder(Long buyerId, OrderRequest request);
+    OrderResponse getOrderDetail(Long orderId, Long userId);
+    PageResponse<OrderResponse> listOrders(Long userId, Integer page, Integer limit, String status, String role);
+    OrderResponse updateOrderStatus(Long orderId, Long userId, String newStatus);
 }
 

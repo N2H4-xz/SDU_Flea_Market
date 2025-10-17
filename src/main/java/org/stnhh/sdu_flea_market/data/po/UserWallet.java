@@ -14,10 +14,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @TableName("user_wallets")
 public class UserWallet {
-    @TableId(type = IdType.ASSIGN_UUID)
-    private String walletId;
+    @TableId(type = IdType.AUTO)
+    private Long uid;
 
-    private String userId;
+    private Long userId;
     private BigDecimal balance; // 账户余额
     private BigDecimal totalRecharged; // 总充值金额
     private BigDecimal totalSpent; // 总消费金额

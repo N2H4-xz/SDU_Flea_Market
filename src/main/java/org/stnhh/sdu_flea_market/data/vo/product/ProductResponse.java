@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductResponse {
-    private String product_id;
+    private Long product_id;
     private String title;
     private String description;
     private BigDecimal price;
@@ -29,7 +29,7 @@ public class ProductResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SellerInfo {
-        private String user_id;
+        private Long user_id;
         private String nickname;
         private String avatar;
         private String campus;

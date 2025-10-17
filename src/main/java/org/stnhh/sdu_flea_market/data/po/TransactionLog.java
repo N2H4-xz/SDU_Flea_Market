@@ -14,10 +14,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @TableName("transaction_logs")
 public class TransactionLog {
-    @TableId(type = IdType.ASSIGN_UUID)
-    private String logId;
-    
-    private String userId;
+    @TableId(type = IdType.AUTO)
+    private Long uid;
+
+    private Long userId;
     private String type; // recharge/purchase/refund/withdrawal
     private BigDecimal amount;
     private BigDecimal balanceBefore;

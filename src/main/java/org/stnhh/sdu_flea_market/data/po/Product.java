@@ -14,10 +14,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @TableName("products")
 public class Product {
-    @TableId(type = IdType.ASSIGN_UUID)
-    private String productId;
-    
-    private String sellerId;
+    @TableId(type = IdType.AUTO)
+    private Long uid;
+
+    private Long sellerId;
     private String title;
     private String description;
     private String category; // 电子产品/图书/服装/其他

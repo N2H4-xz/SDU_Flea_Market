@@ -9,9 +9,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MessageResponse {
-    private String message_id;
-    private String sender_id;
-    private String recipient_id;
+    private Long message_id;
+    private Long sender_id;
+    private Long recipient_id;
     private String content;
     private LocalDateTime created_at;
 }

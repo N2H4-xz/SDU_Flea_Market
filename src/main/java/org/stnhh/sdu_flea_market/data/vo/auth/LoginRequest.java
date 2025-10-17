@@ -8,7 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoginRequest {
-    private String email;
+    private String username; // 用户名登录
+    private String email;    // 邮箱登录（可选）
     private String password;
 }
 

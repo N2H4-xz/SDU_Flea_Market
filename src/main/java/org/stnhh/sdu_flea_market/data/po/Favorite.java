@@ -13,11 +13,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @TableName("favorites")
 public class Favorite {
-    @TableId(type = IdType.ASSIGN_UUID)
-    private String favoriteId;
-    
-    private String userId;
-    private String productId;
+    @TableId(type = IdType.AUTO)
+    private Long uid;
+
+    private Long userId;
+    private Long productId;
     
     private LocalDateTime createdAt;
 }

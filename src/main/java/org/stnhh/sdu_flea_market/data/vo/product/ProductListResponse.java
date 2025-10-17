@@ -10,14 +10,14 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductListResponse {
-    private String product_id;
+    private Long product_id;
     private String title;
     private BigDecimal price;
     private String condition;
     private String campus;
     private String category;
     private String thumbnail;
-    private String seller_id;
+    private Long seller_id;
     private String seller_nickname;
     private String status;
     private LocalDateTime created_at;
