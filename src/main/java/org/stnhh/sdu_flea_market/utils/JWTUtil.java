@@ -39,7 +39,7 @@ public class JWTUtil {
         REFRESH_SECRET_KEY = refreshSecretKey;
     }
 
-    public static final int EXPIRE_TIME = 1800;//Token过期时间
+    public static final int EXPIRE_TIME = 1800000;//Token过期时间
     public static final int REFRESH_EXPIRE_TIME = 2 * 60 *60;//RefreshToken过期时间
 
     //生成token - 支持 Long 类型的 userId

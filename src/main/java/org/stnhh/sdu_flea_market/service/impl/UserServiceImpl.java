@@ -28,29 +28,25 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User register(String username, String email, String password) {
-        // 验证用户名、邮箱和密码不为空
+        // 验证用户名和密码不为空
         if (username == null || username.trim().isEmpty()) {
             throw new RuntimeException("用户名不能为空");
-        }
-        if (email == null || email.trim().isEmpty()) {
-            throw new RuntimeException("邮箱不能为空");
         }
         if (password == null || password.trim().isEmpty()) {
             throw new RuntimeException("密码不能为空");
         }
 
-        // 检查用户名或邮箱是否已存在
+        // 检查用户名是否已存在
         QueryWrapper<User> wrapper = new QueryWrapper<>();
-        wrapper.eq("username", username).or().eq("email", email);
+        wrapper.eq("username", username);
         if (userMapper.selectCount(wrapper) > 0) {
-            throw new RuntimeException("用户名或邮箱已存在");
+            throw new RuntimeException("用户名已存在");
         }
 
         User user = new User();
         user.setUsername(username);
-        user.setEmail(email);
         user.setPasswordHash(BCrypt.hashpw(password, BCrypt.gensalt()));
-        user.setStatus("active");
+        user.setUserStatus("active");
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
 
@@ -59,23 +55,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public LoginResponse login(String username, String email, String password) {
+    public LoginResponse login(String username,  String password) {
         // 优先使用用户名登录，如果没有提供用户名则使用邮箱
         QueryWrapper<User> wrapper = new QueryWrapper<>();
 
         if (username != null && !username.trim().isEmpty()) {
             wrapper.eq("username", username);
-        } else if (email != null && !email.trim().isEmpty()) {
-            wrapper.eq("email", email);
+
         } else {
-            throw new RuntimeException("用户名或邮箱不能为空");
+            throw new RuntimeException("用户名不能为空");
         }
 
         User user = userMapper.selectOne(wrapper);
 
         // 验证用户存在且密码正确
         if (user == null || !BCrypt.checkpw(password, user.getPasswordHash())) {
-            throw new RuntimeException("用户名/邮箱或密码错误");
+            throw new RuntimeException("用户名或密码错误");
         }
 
         // 生成JWT令牌
@@ -85,7 +80,6 @@ public class UserServiceImpl implements UserService {
         LoginResponse response = new LoginResponse();
         response.setUser_id(user.getUid());
         response.setUsername(user.getUsername());
-        response.setEmail(user.getEmail());
         response.setToken(token);
         response.setExpires_in(JWTUtil.EXPIRE_TIME);
 
@@ -107,7 +101,6 @@ public class UserServiceImpl implements UserService {
         UserProfileResponse response = new UserProfileResponse();
         response.setUser_id(user.getUid());
         response.setUsername(user.getUsername());
-        response.setEmail(user.getEmail());
         response.setAvatar(user.getAvatar());
         response.setNickname(user.getNickname());
         response.setCampus(user.getCampus());

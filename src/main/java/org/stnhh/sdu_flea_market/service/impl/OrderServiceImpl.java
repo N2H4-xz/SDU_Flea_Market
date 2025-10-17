@@ -44,7 +44,7 @@ public class OrderServiceImpl implements OrderService {
         order.setBuyerId(buyerId);
         order.setSellerId(product.getSellerId());
         order.setAmount(product.getPrice());
-        order.setStatus("pending_payment");
+        order.setOrderStatus("pending_payment");
         order.setPaymentMethod(request.getPayment_method());
         order.setQuantity(request.getQuantity() != null ? request.getQuantity() : 1);
         order.setCreatedAt(LocalDateTime.now());
@@ -82,7 +82,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         if (status != null && !status.isEmpty()) {
-            wrapper.eq("status", status);
+            wrapper.eq("order_status", status);
         }
 
         wrapper.orderByDesc("created_at");
@@ -125,7 +125,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         // 验证状态转换的有效性
-        String currentStatus = order.getStatus();
+        String currentStatus = order.getOrderStatus();
         if ("pending_payment".equals(currentStatus) && "paid".equals(newStatus)) {
             // 允许：待支付 -> 已支付
         } else if ("paid".equals(currentStatus) && "completed".equals(newStatus)) {
@@ -138,7 +138,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         // 更新订单状态
-        order.setStatus(newStatus);
+        order.setOrderStatus(newStatus);
         if ("paid".equals(newStatus)) {
             order.setPaidAt(LocalDateTime.now());
         } else if ("completed".equals(newStatus)) {
@@ -157,7 +157,7 @@ public class OrderServiceImpl implements OrderService {
         response.setBuyer_id(order.getBuyerId());
         response.setSeller_id(order.getSellerId());
         response.setAmount(order.getAmount());
-        response.setStatus(order.getStatus());
+        response.setStatus(order.getOrderStatus());
         response.setPayment_method(order.getPaymentMethod());
         response.setCreated_at(order.getCreatedAt());
         response.setPaid_at(order.getPaidAt());

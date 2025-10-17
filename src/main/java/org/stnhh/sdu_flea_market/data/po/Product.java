@@ -20,14 +20,14 @@ public class Product {
     private Long sellerId;
     private String title;
     private String description;
-    private String category; // 电子产品/图书/服装/其他
+    private String category;
     private BigDecimal price;
-    private String condition; // 全新/九成新/八成新/七成新/较旧
+    private String itemCondition;
     private String campus;
-    private String status; // active/sold/inactive
+    private Integer productStatus; // 0=active, 1=sold, 2=inactive, 3=deleted, 4=reserved
     private Integer viewCount;
     private Boolean isDeleted;
-    
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

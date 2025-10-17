@@ -19,7 +19,7 @@ public class ProductListResponse {
     private String thumbnail;
     private Long seller_id;
     private String seller_nickname;
-    private String status;
+    private Integer status;
     private LocalDateTime created_at;
 }
 

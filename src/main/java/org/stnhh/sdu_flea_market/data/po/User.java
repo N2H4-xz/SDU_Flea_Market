@@ -15,9 +15,8 @@ import java.time.LocalDateTime;
 public class User {
     @TableId(type = IdType.AUTO)
     private Long uid;
-    
+
     private String username;
-    private String email;
     private String passwordHash;
     private String avatar;
     private String nickname;
@@ -26,8 +25,8 @@ public class User {
     private String phone;
     private String wechat;
     private String bio;
-    private String status; // active/inactive/banned
-    
+    private String userStatus; // active/inactive/banned
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

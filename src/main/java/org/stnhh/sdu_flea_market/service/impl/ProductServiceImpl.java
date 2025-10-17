@@ -39,9 +39,9 @@ public class ProductServiceImpl implements ProductService {
         product.setDescription(request.getDescription());
         product.setCategory(request.getCategory());
         product.setPrice(request.getPrice());
-        product.setCondition(request.getCondition());
+        product.setItemCondition(request.getCondition());
         product.setCampus(request.getCampus());
-        product.setStatus("active");
+        product.setProductStatus(0); // 0=active
         product.setViewCount(0);
         product.setIsDeleted(false);
         product.setCreatedAt(LocalDateTime.now());
@@ -77,11 +77,11 @@ public class ProductServiceImpl implements ProductService {
         response.setTitle(product.getTitle());
         response.setDescription(product.getDescription());
         response.setPrice(product.getPrice());
-        response.setCondition(product.getCondition());
+        response.setCondition(product.getItemCondition());
         response.setCategory(product.getCategory());
         response.setCampus(product.getCampus());
         response.setImages(images.stream().map(ProductImage::getImageUrl).collect(Collectors.toList()));
-        response.setStatus(product.getStatus());
+        response.setStatus(product.getProductStatus());
         response.setView_count(product.getViewCount());
         response.setCreated_at(product.getCreatedAt());
         response.setUpdated_at(product.getUpdatedAt());
@@ -106,7 +106,7 @@ public class ProductServiceImpl implements ProductService {
                                                           String category, String campus, String sort, String condition) {
         // 构建查询条件：只查询未删除且状态为活跃的商品
         QueryWrapper<Product> wrapper = new QueryWrapper<>();
-        wrapper.eq("is_deleted", false).eq("status", "active");
+        wrapper.eq("is_deleted", false).eq("product_status", 0);
 
         // 根据关键词搜索商品标题或描述
         if (keyword != null && !keyword.isEmpty()) {
@@ -122,7 +122,7 @@ public class ProductServiceImpl implements ProductService {
         }
         // 按商品状况筛选
         if (condition != null && !condition.isEmpty()) {
-            wrapper.eq("condition", condition);
+            wrapper.eq("item_condition", condition);
         }
 
         // 处理排序逻辑
@@ -144,10 +144,10 @@ public class ProductServiceImpl implements ProductService {
             item.setProduct_id(product.getUid());
             item.setTitle(product.getTitle());
             item.setPrice(product.getPrice());
-            item.setCondition(product.getCondition());
+            item.setCondition(product.getItemCondition());
             item.setCampus(product.getCampus());
             item.setCategory(product.getCategory());
-            item.setStatus(product.getStatus());
+            item.setStatus(product.getProductStatus());
             item.setCreated_at(product.getCreatedAt());
 
             // 获取商品缩略图

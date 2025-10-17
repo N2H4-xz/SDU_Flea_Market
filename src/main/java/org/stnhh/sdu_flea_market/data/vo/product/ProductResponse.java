@@ -20,7 +20,7 @@ public class ProductResponse {
     private String campus;
     private List<String> images;
     private SellerInfo seller;
-    private String status;
+    private Integer status;
     private Integer view_count;
     private LocalDateTime created_at;
     private LocalDateTime updated_at;

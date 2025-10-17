@@ -27,7 +27,7 @@ public class AuthController {
             return Result.error(400, "两次密码不一致");
         }
         // 调用服务进行用户注册
-        User user = userService.register(request.getUsername(), request.getEmail(), request.getPassword());
+        User user = userService.register(request.getUsername(), null, request.getPassword());
         return Result.success(user, "注册成功");
 
     }
@@ -35,7 +35,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<Result> login(@RequestBody LoginRequest request) {
         // 调用服务进行用户登录（支持用户名或邮箱登录）
-        LoginResponse response = userService.login(request.getUsername(), request.getEmail(), request.getPassword());
+        LoginResponse response = userService.login(request.getUsername(),  request.getPassword());
         return Result.success(response, "登录成功");
     }
 
