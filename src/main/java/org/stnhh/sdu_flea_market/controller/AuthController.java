@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.stnhh.sdu_flea_market.annotation.Auth;
 import org.stnhh.sdu_flea_market.data.po.User;
 import org.stnhh.sdu_flea_market.data.vo.Result;
 import org.stnhh.sdu_flea_market.data.vo.auth.ChangePasswordRequest;
@@ -12,7 +13,6 @@ import org.stnhh.sdu_flea_market.data.vo.auth.LoginResponse;
 import org.stnhh.sdu_flea_market.data.vo.auth.RegisterRequest;
 import org.stnhh.sdu_flea_market.service.UserService;
 import org.stnhh.sdu_flea_market.utils.ResponseUtil;
-import org.stnhh.sdu_flea_market.utils.TokenUtil;
 
 @RestController
 @RequestMapping("/auth")
@@ -49,26 +49,26 @@ public class AuthController {
         }
     }
 
+    @Auth
     @PostMapping("/logout")
     public ResponseEntity<Result> logout(HttpServletRequest request) {
         try {
-            // 从请求头中提取JWT令牌
-            String token = TokenUtil.extractToken(request);
+            // 从请求属性中获取userId（由AuthAspect设置）
+            String userId = (String) request.getAttribute("userId");
             // 调用服务进行登出
-            userService.logout(token);
+            userService.logout(userId);
             return ResponseUtil.build(Result.ok());
         } catch (Exception e) {
             return ResponseUtil.build(Result.error(400, e.getMessage()));
         }
     }
 
+    @Auth
     @PostMapping("/change-password")
     public ResponseEntity<Result> changePassword(@RequestBody ChangePasswordRequest request, HttpServletRequest httpRequest) {
         try {
-            // 从请求头中提取JWT令牌
-            String token = TokenUtil.extractToken(httpRequest);
-            // 从令牌中提取用户ID
-            String userId = extractUserIdFromToken(token);
+            // 从请求属性中获取userId（由AuthAspect设置）
+            String userId = (String) httpRequest.getAttribute("userId");
 
             // 验证两次输入的新密码是否一致
             if (!request.getNew_password().equals(request.getConfirm_password())) {
@@ -81,11 +81,6 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseUtil.build(Result.error(400, e.getMessage()));
         }
-    }
-
-    private String extractUserIdFromToken(String token) {
-        // 使用TokenUtil中的方法提取用户ID
-        return TokenUtil.extractUserIdFromToken(token);
     }
 }
 

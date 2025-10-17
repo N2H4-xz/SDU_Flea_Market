@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.stnhh.sdu_flea_market.annotation.Auth;
 import org.stnhh.sdu_flea_market.data.po.Product;
 import org.stnhh.sdu_flea_market.data.vo.Result;
 import org.stnhh.sdu_flea_market.data.vo.product.ProductRequest;
@@ -12,7 +13,6 @@ import org.stnhh.sdu_flea_market.data.vo.product.ProductListResponse;
 import org.stnhh.sdu_flea_market.data.vo.PageResponse;
 import org.stnhh.sdu_flea_market.service.ProductService;
 import org.stnhh.sdu_flea_market.utils.ResponseUtil;
-import org.stnhh.sdu_flea_market.utils.TokenUtil;
 
 @RestController
 @RequestMapping("/products")
@@ -21,12 +21,12 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
+    @Auth
     @PostMapping
     public ResponseEntity<Result> createProduct(@RequestBody ProductRequest request, HttpServletRequest httpRequest) {
         try {
-            // 从请求头中提取JWT令牌
-            String token = TokenUtil.extractToken(httpRequest);
-            String sellerId = extractUserIdFromToken(token);
+            // 从请求属性中获取userId（由AuthAspect设置）
+            String sellerId = (String) httpRequest.getAttribute("userId");
 
             // 创建商品
             Product product = productService.createProduct(sellerId, request);
@@ -65,12 +65,12 @@ public class ProductController {
         }
     }
 
+    @Auth
     @PutMapping("/{productId}")
     public ResponseEntity<Result> updateProduct(@PathVariable String productId, @RequestBody ProductRequest request, HttpServletRequest httpRequest) {
         try {
-            // 从请求头中提取JWT令牌
-            String token = TokenUtil.extractToken(httpRequest);
-            String sellerId = extractUserIdFromToken(token);
+            // 从请求属性中获取userId（由AuthAspect设置）
+            String sellerId = (String) httpRequest.getAttribute("userId");
 
             // 更新商品信息
             ProductResponse response = productService.updateProduct(productId, sellerId, request);
@@ -80,12 +80,12 @@ public class ProductController {
         }
     }
 
+    @Auth
     @DeleteMapping("/{productId}")
     public ResponseEntity<Result> deleteProduct(@PathVariable String productId, HttpServletRequest httpRequest) {
         try {
-            // 从请求头中提取JWT令牌
-            String token = TokenUtil.extractToken(httpRequest);
-            String sellerId = extractUserIdFromToken(token);
+            // 从请求属性中获取userId（由AuthAspect设置）
+            String sellerId = (String) httpRequest.getAttribute("userId");
 
             // 删除商品
             productService.deleteProduct(productId, sellerId);
@@ -93,11 +93,6 @@ public class ProductController {
         } catch (Exception e) {
             return ResponseUtil.build(Result.error(400, e.getMessage()));
         }
-    }
-
-    private String extractUserIdFromToken(String token) {
-        // 使用TokenUtil中的方法提取用户ID
-        return TokenUtil.extractUserIdFromToken(token);
     }
 }
 

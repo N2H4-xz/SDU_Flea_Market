@@ -4,12 +4,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.stnhh.sdu_flea_market.annotation.Auth;
 import org.stnhh.sdu_flea_market.data.vo.Result;
 import org.stnhh.sdu_flea_market.data.vo.user.UpdateProfileRequest;
 import org.stnhh.sdu_flea_market.data.vo.user.UserProfileResponse;
 import org.stnhh.sdu_flea_market.service.UserService;
 import org.stnhh.sdu_flea_market.utils.ResponseUtil;
-import org.stnhh.sdu_flea_market.utils.TokenUtil;
 
 @RestController
 @RequestMapping("/users")
@@ -18,12 +18,12 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Auth
     @GetMapping("/profile")
     public ResponseEntity<Result> getProfile(HttpServletRequest request) {
         try {
-            // 从请求头中提取JWT令牌
-            String token = TokenUtil.extractToken(request);
-            String userId = extractUserIdFromToken(token);
+            // 从请求属性中获取userId（由AuthAspect设置）
+            String userId = (String) request.getAttribute("userId");
 
             // 获取用户个人资料
             UserProfileResponse profile = userService.getProfile(userId);
@@ -33,12 +33,12 @@ public class UserController {
         }
     }
 
+    @Auth
     @PutMapping("/profile")
     public ResponseEntity<Result> updateProfile(@RequestBody UpdateProfileRequest request, HttpServletRequest httpRequest) {
         try {
-            // 从请求头中提取JWT令牌
-            String token = TokenUtil.extractToken(httpRequest);
-            String userId = extractUserIdFromToken(token);
+            // 从请求属性中获取userId（由AuthAspect设置）
+            String userId = (String) httpRequest.getAttribute("userId");
 
             // 更新用户个人资料
             UserProfileResponse profile = userService.updateProfile(userId, request);
@@ -46,11 +46,6 @@ public class UserController {
         } catch (Exception e) {
             return ResponseUtil.build(Result.error(400, e.getMessage()));
         }
-    }
-
-    private String extractUserIdFromToken(String token) {
-        // 使用TokenUtil中的方法提取用户ID
-        return TokenUtil.extractUserIdFromToken(token);
     }
 }
 

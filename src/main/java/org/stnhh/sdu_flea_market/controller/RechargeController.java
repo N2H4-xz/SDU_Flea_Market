@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.stnhh.sdu_flea_market.annotation.Auth;
 import org.stnhh.sdu_flea_market.data.po.Recharge;
 import org.stnhh.sdu_flea_market.data.vo.Result;
 import org.stnhh.sdu_flea_market.data.vo.recharge.RechargeRequest;
@@ -11,7 +12,6 @@ import org.stnhh.sdu_flea_market.data.vo.recharge.RechargeResponse;
 import org.stnhh.sdu_flea_market.data.vo.PageResponse;
 import org.stnhh.sdu_flea_market.service.RechargeService;
 import org.stnhh.sdu_flea_market.utils.ResponseUtil;
-import org.stnhh.sdu_flea_market.utils.TokenUtil;
 
 @RestController
 @RequestMapping("/recharge")
@@ -20,12 +20,12 @@ public class RechargeController {
     @Autowired
     private RechargeService rechargeService;
 
+    @Auth
     @PostMapping
     public ResponseEntity<Result> createRecharge(@RequestBody RechargeRequest request, HttpServletRequest httpRequest) {
         try {
-            // 从请求头中提取JWT令牌
-            String token = TokenUtil.extractToken(httpRequest);
-            String userId = extractUserIdFromToken(token);
+            // 从请求属性中获取userId（由AuthAspect设置）
+            String userId = (String) httpRequest.getAttribute("userId");
 
             // 创建充值订单
             Recharge recharge = rechargeService.createRecharge(userId, request);
@@ -35,6 +35,7 @@ public class RechargeController {
         }
     }
 
+    @Auth
     @GetMapping("/history")
     public ResponseEntity<Result> getRechargeHistory(
             @RequestParam(defaultValue = "1") Integer page,
@@ -42,9 +43,8 @@ public class RechargeController {
             @RequestParam(required = false) String status,
             HttpServletRequest httpRequest) {
         try {
-            // 从请求头中提取JWT令牌
-            String token = TokenUtil.extractToken(httpRequest);
-            String userId = extractUserIdFromToken(token);
+            // 从请求属性中获取userId（由AuthAspect设置）
+            String userId = (String) httpRequest.getAttribute("userId");
 
             // 获取充值历史记录
             PageResponse<RechargeResponse> response = rechargeService.getRechargeHistory(userId, page, limit, status);
@@ -52,11 +52,6 @@ public class RechargeController {
         } catch (Exception e) {
             return ResponseUtil.build(Result.error(400, e.getMessage()));
         }
-    }
-
-    private String extractUserIdFromToken(String token) {
-        // 使用TokenUtil中的方法提取用户ID
-        return TokenUtil.extractUserIdFromToken(token);
     }
 }
 

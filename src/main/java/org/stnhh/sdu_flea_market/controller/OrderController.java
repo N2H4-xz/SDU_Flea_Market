@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.stnhh.sdu_flea_market.annotation.Auth;
 import org.stnhh.sdu_flea_market.data.po.Order;
 import org.stnhh.sdu_flea_market.data.vo.Result;
 import org.stnhh.sdu_flea_market.data.vo.order.OrderRequest;
@@ -12,7 +13,6 @@ import org.stnhh.sdu_flea_market.data.vo.order.OrderStatusUpdateRequest;
 import org.stnhh.sdu_flea_market.data.vo.PageResponse;
 import org.stnhh.sdu_flea_market.service.OrderService;
 import org.stnhh.sdu_flea_market.utils.ResponseUtil;
-import org.stnhh.sdu_flea_market.utils.TokenUtil;
 
 @RestController
 @RequestMapping("/orders")
@@ -21,12 +21,12 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
+    @Auth
     @PostMapping
     public ResponseEntity<Result> createOrder(@RequestBody OrderRequest request, HttpServletRequest httpRequest) {
         try {
-            // 从请求头中提取JWT令牌
-            String token = TokenUtil.extractToken(httpRequest);
-            String buyerId = extractUserIdFromToken(token);
+            // 从请求属性中获取userId（由AuthAspect设置）
+            String buyerId = (String) httpRequest.getAttribute("userId");
 
             // 创建订单
             Order order = orderService.createOrder(buyerId, request);
@@ -36,6 +36,7 @@ public class OrderController {
         }
     }
 
+    @Auth
     @GetMapping
     public ResponseEntity<Result> listOrders(
             @RequestParam(defaultValue = "1") Integer page,
@@ -44,9 +45,8 @@ public class OrderController {
             @RequestParam(defaultValue = "buyer") String role,
             HttpServletRequest httpRequest) {
         try {
-            // 从请求头中提取JWT令牌
-            String token = TokenUtil.extractToken(httpRequest);
-            String userId = extractUserIdFromToken(token);
+            // 从请求属性中获取userId（由AuthAspect设置）
+            String userId = (String) httpRequest.getAttribute("userId");
 
             // 获取订单列表
             PageResponse<OrderResponse> response = orderService.listOrders(userId, page, limit, status, role);
@@ -56,12 +56,12 @@ public class OrderController {
         }
     }
 
+    @Auth
     @GetMapping("/{orderId}")
     public ResponseEntity<Result> getOrderDetail(@PathVariable String orderId, HttpServletRequest httpRequest) {
         try {
-            // 从请求头中提取JWT令牌
-            String token = TokenUtil.extractToken(httpRequest);
-            String userId = extractUserIdFromToken(token);
+            // 从请求属性中获取userId（由AuthAspect设置）
+            String userId = (String) httpRequest.getAttribute("userId");
 
             // 获取订单详情
             OrderResponse response = orderService.getOrderDetail(orderId, userId);
@@ -71,12 +71,12 @@ public class OrderController {
         }
     }
 
+    @Auth
     @PatchMapping("/{orderId}/status")
     public ResponseEntity<Result> updateOrderStatus(@PathVariable String orderId, @RequestBody OrderStatusUpdateRequest request, HttpServletRequest httpRequest) {
         try {
-            // 从请求头中提取JWT令牌
-            String token = TokenUtil.extractToken(httpRequest);
-            String userId = extractUserIdFromToken(token);
+            // 从请求属性中获取userId（由AuthAspect设置）
+            String userId = (String) httpRequest.getAttribute("userId");
 
             // 更新订单状态
             OrderResponse response = orderService.updateOrderStatus(orderId, userId, request.getStatus());
@@ -84,11 +84,6 @@ public class OrderController {
         } catch (Exception e) {
             return ResponseUtil.build(Result.error(400, e.getMessage()));
         }
-    }
-
-    private String extractUserIdFromToken(String token) {
-        // 使用TokenUtil中的方法提取用户ID
-        return TokenUtil.extractUserIdFromToken(token);
     }
 }
 
