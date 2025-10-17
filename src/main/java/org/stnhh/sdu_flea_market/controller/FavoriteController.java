@@ -29,9 +29,9 @@ public class FavoriteController {
 
             // 添加收藏
             Favorite favorite = favoriteService.addFavorite(userId, request.getProduct_id());
-            return ResponseUtil.build(Result.success(favorite, "收藏成功"));
+            return Result.success(favorite, "收藏成功");
         } catch (Exception e) {
-            return ResponseUtil.build(Result.error(400, e.getMessage()));
+            return Result.error(400, e.getMessage());
         }
     }
 
@@ -44,9 +44,9 @@ public class FavoriteController {
 
             // 删除收藏
             favoriteService.removeFavorite(userId, productId);
-            return ResponseUtil.build(Result.ok());
+            return Result.ok();
         } catch (Exception e) {
-            return ResponseUtil.build(Result.error(400, e.getMessage()));
+            return Result.error(400, e.getMessage());
         }
     }
 
@@ -62,9 +62,9 @@ public class FavoriteController {
 
             // 获取用户的收藏列表
             PageResponse<FavoriteResponse> response = favoriteService.listFavorites(userId, page, limit);
-            return ResponseUtil.build(Result.success(response, "获取成功"));
+            return Result.success(response, "获取成功");
         } catch (Exception e) {
-            return ResponseUtil.build(Result.error(400, e.getMessage()));
+            return Result.error(400, e.getMessage());
         }
     }
 

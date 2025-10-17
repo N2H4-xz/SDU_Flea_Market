@@ -30,9 +30,9 @@ public class OrderController {
 
             // 创建订单
             Order order = orderService.createOrder(buyerId, request);
-            return ResponseUtil.build(Result.success(order, "订单创建成功"));
+            return Result.success(order, "订单创建成功");
         } catch (Exception e) {
-            return ResponseUtil.build(Result.error(400, e.getMessage()));
+            return Result.error(400, e.getMessage());
         }
     }
 
@@ -50,9 +50,9 @@ public class OrderController {
 
             // 获取订单列表
             PageResponse<OrderResponse> response = orderService.listOrders(userId, page, limit, status, role);
-            return ResponseUtil.build(Result.success(response, "获取成功"));
+            return Result.success(response, "获取成功");
         } catch (Exception e) {
-            return ResponseUtil.build(Result.error(400, e.getMessage()));
+            return Result.error(400, e.getMessage());
         }
     }
 
@@ -65,9 +65,9 @@ public class OrderController {
 
             // 获取订单详情
             OrderResponse response = orderService.getOrderDetail(orderId, userId);
-            return ResponseUtil.build(Result.success(response, "获取成功"));
+            return Result.success(response, "获取成功");
         } catch (Exception e) {
-            return ResponseUtil.build(Result.error(404, e.getMessage()));
+            return Result.error(404, e.getMessage());
         }
     }
 
@@ -80,9 +80,9 @@ public class OrderController {
 
             // 更新订单状态
             OrderResponse response = orderService.updateOrderStatus(orderId, userId, request.getStatus());
-            return ResponseUtil.build(Result.success(response, "订单状态更新成功"));
+            return Result.success(response, "订单状态更新成功");
         } catch (Exception e) {
-            return ResponseUtil.build(Result.error(400, e.getMessage()));
+            return Result.error(400, e.getMessage());
         }
     }
 

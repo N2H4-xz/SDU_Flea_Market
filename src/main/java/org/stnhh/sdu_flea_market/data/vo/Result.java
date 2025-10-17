@@ -4,34 +4,42 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Result {
+
     private Integer code; // 业务状态码
     private Object data;  // 数据
     private String msg;   // 提示信息
 
+    public static ResponseEntity<Result> build(Result result) {
+        return ResponseEntity
+                .status(result.httpStatus())
+                .body(result);
+    }
+
     /**
      * 返回成功结果
      */
-    public static Result success(Object data, String msg) {
-        return new Result(200, data, msg);
+    public static ResponseEntity<Result> success(Object data, String msg) {
+        return build(new Result(200, data, msg));
     }
 
     /**
      * 返回成功（无数据）
      */
-    public static Result ok() {
-        return new Result(200, null, "成功");
+    public static ResponseEntity<Result> ok() {
+        return build(new Result(200, null, "成功"));
     }
 
     /**
      * 返回错误结果
      */
-    public static Result error(Integer code, String msg) {
-        return new Result(code, null, msg);
+    public static ResponseEntity<Result> error(Integer code, String msg) {
+        return build(new Result(code, null, msg));
     }
 
     /**

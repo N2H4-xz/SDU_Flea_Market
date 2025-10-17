@@ -27,9 +27,9 @@ public class UserController {
 
             // 获取用户个人资料
             UserProfileResponse profile = userService.getProfile(userId);
-            return ResponseUtil.build(Result.success(profile, "获取成功"));
+            return Result.success(profile, "获取成功");
         } catch (Exception e) {
-            return ResponseUtil.build(Result.error(400, e.getMessage()));
+            return Result.error(400, e.getMessage());
         }
     }
 
@@ -42,9 +42,9 @@ public class UserController {
 
             // 更新用户个人资料
             UserProfileResponse profile = userService.updateProfile(userId, request);
-            return ResponseUtil.build(Result.success(profile, "更新成功"));
+            return Result.success(profile, "更新成功");
         } catch (Exception e) {
-            return ResponseUtil.build(Result.error(400, e.getMessage()));
+            return Result.error(400, e.getMessage());
         }
     }
 
