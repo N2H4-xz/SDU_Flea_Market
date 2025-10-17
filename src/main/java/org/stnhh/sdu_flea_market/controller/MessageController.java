@@ -31,9 +31,9 @@ public class MessageController {
 
             // 获取消息历史记录
             PageResponse<MessageResponse> response = messageService.getMessageHistory(currentUserId, userId, page, limit);
-            return ResponseUtil.build(Result.success(response, "获取成功"));
+            return Result.success(response, "获取成功");
         } catch (Exception e) {
-            return ResponseUtil.build(Result.error(400, e.getMessage()));
+            return Result.error(400, e.getMessage());
         }
     }
 }

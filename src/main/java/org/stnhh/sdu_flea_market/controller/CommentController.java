@@ -29,9 +29,9 @@ public class CommentController {
 
             // 创建留言
             Comment comment = commentService.createComment(productId, authorId, request);
-            return ResponseUtil.build(Result.success(comment, "留言发布成功"));
+            return Result.success(comment, "留言发布成功");
         } catch (Exception e) {
-            return ResponseUtil.build(Result.error(400, e.getMessage()));
+            return Result.error(400, e.getMessage());
         }
     }
 
@@ -44,9 +44,9 @@ public class CommentController {
         try {
             // 获取商品评论列表
             PageResponse<CommentResponse> response = commentService.listComments(productId, page, limit, sort);
-            return ResponseUtil.build(Result.success(response, "获取成功"));
+            return Result.success(response, "获取成功");
         } catch (Exception e) {
-            return ResponseUtil.build(Result.error(400, e.getMessage()));
+            return Result.error(400, e.getMessage());
         }
     }
 
@@ -59,9 +59,9 @@ public class CommentController {
 
             // 删除留言
             commentService.deleteComment(commentId, userId);
-            return ResponseUtil.build(Result.ok());
+            return Result.ok();
         } catch (Exception e) {
-            return ResponseUtil.build(Result.error(400, e.getMessage()));
+            return Result.error(400, e.getMessage());
         }
     }
 }

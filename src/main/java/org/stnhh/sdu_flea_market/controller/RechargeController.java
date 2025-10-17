@@ -29,9 +29,9 @@ public class RechargeController {
 
             // 创建充值订单
             Recharge recharge = rechargeService.createRecharge(userId, request);
-            return ResponseUtil.build(Result.success(recharge, "充值订单创建成功"));
+            return Result.success(recharge, "充值订单创建成功");
         } catch (Exception e) {
-            return ResponseUtil.build(Result.error(400, e.getMessage()));
+            return Result.error(400, e.getMessage());
         }
     }
 
@@ -48,9 +48,9 @@ public class RechargeController {
 
             // 获取充值历史记录
             PageResponse<RechargeResponse> response = rechargeService.getRechargeHistory(userId, page, limit, status);
-            return ResponseUtil.build(Result.success(response, "获取成功"));
+            return Result.success(response, "获取成功");
         } catch (Exception e) {
-            return ResponseUtil.build(Result.error(400, e.getMessage()));
+            return Result.error(400, e.getMessage());
         }
     }
 }

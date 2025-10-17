@@ -33,7 +33,7 @@ public class AuthAspect {
             String userId = jwtUtil.getUserId(token, JWTUtil.SECRET_KEY);
             request.setAttribute("userId", userId); // 将 userId 添加到请求上下文
         } catch (Exception e) {
-            return ResponseUtil.build(Result.error(403, String.valueOf(e.getMessage())));
+            return Result.error(403, String.valueOf(e.getMessage()));
         }
 
         // 继续执行目标方法

@@ -30,9 +30,9 @@ public class ProductController {
 
             // 创建商品
             Product product = productService.createProduct(sellerId, request);
-            return ResponseUtil.build(Result.success(product, "商品发布成功"));
+            return Result.success(product, "商品发布成功");
         } catch (Exception e) {
-            return ResponseUtil.build(Result.error(400, e.getMessage()));
+            return Result.error(400, e.getMessage());
         }
     }
 
@@ -48,9 +48,9 @@ public class ProductController {
         try {
             // 获取商品列表
             PageResponse<ProductListResponse> response = productService.listProducts(page, limit, keyword, category, campus, sort, condition);
-            return ResponseUtil.build(Result.success(response, "获取成功"));
+            return Result.success(response, "获取成功");
         } catch (Exception e) {
-            return ResponseUtil.build(Result.error(400, e.getMessage()));
+            return Result.error(400, e.getMessage());
         }
     }
 
@@ -59,9 +59,9 @@ public class ProductController {
         try {
             // 获取商品详情
             ProductResponse response = productService.getProductDetail(productId);
-            return ResponseUtil.build(Result.success(response, "获取成功"));
+            return Result.success(response, "获取成功");
         } catch (Exception e) {
-            return ResponseUtil.build(Result.error(404, e.getMessage()));
+            return Result.error(404, e.getMessage());
         }
     }
 
@@ -74,9 +74,9 @@ public class ProductController {
 
             // 更新商品信息
             ProductResponse response = productService.updateProduct(productId, sellerId, request);
-            return ResponseUtil.build(Result.success(response, "商品更新成功"));
+            return Result.success(response, "商品更新成功");
         } catch (Exception e) {
-            return ResponseUtil.build(Result.error(400, e.getMessage()));
+            return Result.error(400, e.getMessage());
         }
     }
 
@@ -89,9 +89,9 @@ public class ProductController {
 
             // 删除商品
             productService.deleteProduct(productId, sellerId);
-            return ResponseUtil.build(Result.ok());
+            return Result.ok();
         } catch (Exception e) {
-            return ResponseUtil.build(Result.error(400, e.getMessage()));
+            return Result.error(400, e.getMessage());
         }
     }
 }

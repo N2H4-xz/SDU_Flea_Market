@@ -26,15 +26,15 @@ public class AuthController {
         try {
             // 验证两次输入的密码是否一致
             if (!request.getPassword().equals(request.getConfirm_password())) {
-                return ResponseUtil.build(Result.error(400, "两次密码不一致"));
+                return Result.error(400, "两次密码不一致");
             }
 
             // 调用服务进行用户注册
             User user = userService.register(request.getUsername(), request.getEmail(), request.getPassword());
 
-            return ResponseUtil.build(Result.success(user, "注册成功"));
+            return Result.success(user, "注册成功");
         } catch (Exception e) {
-            return ResponseUtil.build(Result.error(400, e.getMessage()));
+            return Result.error(400, e.getMessage());
         }
     }
 
@@ -43,9 +43,9 @@ public class AuthController {
         try {
             // 调用服务进行用户登录
             LoginResponse response = userService.login(request.getEmail(), request.getPassword());
-            return ResponseUtil.build(Result.success(response, "登录成功"));
+            return Result.success(response, "登录成功");
         } catch (Exception e) {
-            return ResponseUtil.build(Result.error(401, e.getMessage()));
+            return Result.error(401, e.getMessage());
         }
     }
 
@@ -57,9 +57,9 @@ public class AuthController {
             String userId = (String) request.getAttribute("userId");
             // 调用服务进行登出
             userService.logout(userId);
-            return ResponseUtil.build(Result.ok());
+            return Result.ok();
         } catch (Exception e) {
-            return ResponseUtil.build(Result.error(400, e.getMessage()));
+            return Result.error(400, e.getMessage());
         }
     }
 
@@ -72,15 +72,17 @@ public class AuthController {
 
             // 验证两次输入的新密码是否一致
             if (!request.getNew_password().equals(request.getConfirm_password())) {
-                return ResponseUtil.build(Result.error(400, "两次新密码不一致"));
+                return Result.error(400, "两次新密码不一致");
             }
 
             // 调用服务修改密码
             userService.changePassword(userId, request.getOld_password(), request.getNew_password());
-            return ResponseUtil.build(Result.ok());
+            return Result.ok();
         } catch (Exception e) {
-            return ResponseUtil.build(Result.error(400, e.getMessage()));
+            return Result.error(400, e.getMessage());
         }
     }
+
+
 }
 
