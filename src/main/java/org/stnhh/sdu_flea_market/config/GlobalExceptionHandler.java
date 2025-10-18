@@ -1,6 +1,7 @@
 package org.stnhh.sdu_flea_market.config;
 
 import org.stnhh.sdu_flea_market.data.vo.Result;
+import org.stnhh.sdu_flea_market.exception.*;
 import org.stnhh.sdu_flea_market.utils.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,69 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    /**
+     * 捕获业务异常基类
+     */
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<Result> handleBusinessException(BusinessException ex) {
+        log.warn("业务异常: code={}, message={}", ex.getCode(), ex.getMessage());
+        return Result.error(ex.getCode(), ex.getMessage());
+    }
+
+    /**
+     * 捕获资源不存在异常
+     */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Result> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        log.warn("资源不存在: {}", ex.getMessage());
+        return Result.error(404, ex.getMessage());
+    }
+
+    /**
+     * 捕获无权限异常
+     */
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<Result> handleUnauthorizedException(UnauthorizedException ex) {
+        log.warn("无权限操作: {}", ex.getMessage());
+        return Result.error(403, ex.getMessage());
+    }
+
+    /**
+     * 捕获余额不足异常
+     */
+    @ExceptionHandler(InsufficientBalanceException.class)
+    public ResponseEntity<Result> handleInsufficientBalanceException(InsufficientBalanceException ex) {
+        log.warn("余额不足: {}", ex.getMessage());
+        return Result.error(400, ex.getMessage());
+    }
+
+    /**
+     * 捕获参数无效异常
+     */
+    @ExceptionHandler(InvalidParameterException.class)
+    public ResponseEntity<Result> handleInvalidParameterException(InvalidParameterException ex) {
+        log.warn("参数无效: {}", ex.getMessage());
+        return Result.error(400, ex.getMessage());
+    }
+
+    /**
+     * 捕获业务冲突异常
+     */
+    @ExceptionHandler(BusinessConflictException.class)
+    public ResponseEntity<Result> handleBusinessConflictException(BusinessConflictException ex) {
+        log.warn("业务冲突: {}", ex.getMessage());
+        return Result.error(409, ex.getMessage());
+    }
+
+    /**
+     * 捕获用户名已存在异常
+     */
+    @ExceptionHandler(UsernameAlreadyExistsException.class)
+    public ResponseEntity<Result> handleUsernameAlreadyExistsException(UsernameAlreadyExistsException ex) {
+        log.warn("用户注册失败: 用户名已存在, error={}", ex.getMessage());
+        return Result.error(400, "用户名存在");
+    }
 
     /**
      * 捕获 Redis 连接失败异常

@@ -9,6 +9,9 @@ import org.stnhh.sdu_flea_market.data.po.Product;
 import org.stnhh.sdu_flea_market.data.vo.order.OrderRequest;
 import org.stnhh.sdu_flea_market.data.vo.order.OrderResponse;
 import org.stnhh.sdu_flea_market.data.vo.PageResponse;
+import org.stnhh.sdu_flea_market.exception.BusinessConflictException;
+import org.stnhh.sdu_flea_market.exception.ResourceNotFoundException;
+import org.stnhh.sdu_flea_market.exception.UnauthorizedException;
 import org.stnhh.sdu_flea_market.mapper.OrderMapper;
 import org.stnhh.sdu_flea_market.mapper.ProductMapper;
 import org.stnhh.sdu_flea_market.service.OrderService;
@@ -30,12 +33,12 @@ public class OrderServiceImpl implements OrderService {
         // 验证商品是否存在且未被删除
         Product product = productMapper.selectById(request.getProduct_id());
         if (product == null || product.getIsDeleted()) {
-            throw new RuntimeException("商品不存在");
+            throw new ResourceNotFoundException("商品不存在");
         }
 
         // 防止用户购买自己的商品
         if (product.getSellerId().equals(buyerId)) {
-            throw new RuntimeException("不能购买自己的商品");
+            throw new BusinessConflictException("不能购买自己的商品");
         }
 
         // 创建订单
@@ -45,7 +48,7 @@ public class OrderServiceImpl implements OrderService {
         order.setSellerId(product.getSellerId());
         order.setAmount(product.getPrice());
         order.setOrderStatus("pending_payment");
-        order.setPaymentMethod(request.getPayment_method());
+        order.setPaymentMethod("online");  // 默认在线支付
         order.setQuantity(request.getQuantity() != null ? request.getQuantity() : 1);
         order.setCreatedAt(LocalDateTime.now());
         order.setUpdatedAt(LocalDateTime.now());
@@ -58,12 +61,12 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponse getOrderDetail(Long orderId, Long userId) {
         Order order = orderMapper.selectById(orderId);
         if (order == null) {
-            throw new RuntimeException("订单不存在");
+            throw new ResourceNotFoundException("订单不存在");
         }
 
         // Check if user is buyer or seller
         if (!order.getBuyerId().equals(userId) && !order.getSellerId().equals(userId)) {
-            throw new RuntimeException("无权限查看此订单");
+            throw new UnauthorizedException("无权限");
         }
 
         return convertToResponse(order);
@@ -107,21 +110,21 @@ public class OrderServiceImpl implements OrderService {
         // 查询订单
         Order order = orderMapper.selectById(orderId);
         if (order == null) {
-            throw new RuntimeException("订单不存在");
+            throw new ResourceNotFoundException("订单不存在");
         }
 
         // 验证订单状态转换的合法性
         // 只有买家可以标记为已支付
         if ("paid".equals(newStatus) && !order.getBuyerId().equals(userId)) {
-            throw new RuntimeException("只有买家可以标记为已支付");
+            throw new UnauthorizedException("无权限");
         }
         // 只有卖家可以标记为已完成
         if ("completed".equals(newStatus) && !order.getSellerId().equals(userId)) {
-            throw new RuntimeException("只有卖家可以标记为已完成");
+            throw new UnauthorizedException("无权限");
         }
         // 只有买家或卖家可以取消订单
         if ("cancelled".equals(newStatus) && !order.getBuyerId().equals(userId) && !order.getSellerId().equals(userId)) {
-            throw new RuntimeException("无权限取消此订单");
+            throw new UnauthorizedException("无权限");
         }
 
         // 验证状态转换的有效性

@@ -6,7 +6,7 @@ import org.stnhh.sdu_flea_market.data.vo.user.UserProfileResponse;
 import org.stnhh.sdu_flea_market.data.vo.user.UpdateProfileRequest;
 
 public interface UserService {
-    User register(String username, String email, String password);
+    User register(String username, String password);
     LoginResponse login(String username, String password);
     User getUserById(Long userId);
     UserProfileResponse getProfile(Long userId);

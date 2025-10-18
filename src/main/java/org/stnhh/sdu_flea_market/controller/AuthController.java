@@ -26,10 +26,10 @@ public class AuthController {
         if (!request.getPassword().equals(request.getConfirm_password())) {
             return Result.error(400, "两次密码不一致");
         }
-        // 调用服务进行用户注册
-        User user = userService.register(request.getUsername(), null, request.getPassword());
-        return Result.success(user, "注册成功");
 
+        // 调用服务进行用户注册，异常由 GlobalExceptionHandler 处理
+        User user = userService.register(request.getUsername(), request.getPassword());
+        return Result.success(user, "注册成功");
     }
 
     @PostMapping("/login")

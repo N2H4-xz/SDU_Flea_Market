@@ -10,6 +10,5 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class RechargeRequest {
     private BigDecimal amount;
-    private String payment_method;
 }
 

@@ -8,6 +8,7 @@ import org.stnhh.sdu_flea_market.data.po.User;
 import org.stnhh.sdu_flea_market.data.vo.auth.LoginResponse;
 import org.stnhh.sdu_flea_market.data.vo.user.UserProfileResponse;
 import org.stnhh.sdu_flea_market.data.vo.user.UpdateProfileRequest;
+import org.stnhh.sdu_flea_market.exception.UsernameAlreadyExistsException;
 import org.stnhh.sdu_flea_market.mapper.UserMapper;
 import org.stnhh.sdu_flea_market.service.UserService;
 import org.stnhh.sdu_flea_market.utils.JWTUtil;
@@ -27,7 +28,7 @@ public class UserServiceImpl implements UserService {
     private IGlobalCache cache;
 
     @Override
-    public User register(String username, String email, String password) {
+    public User register(String username, String password) {
         // 验证用户名和密码不为空
         if (username == null || username.trim().isEmpty()) {
             throw new RuntimeException("用户名不能为空");
@@ -40,7 +41,7 @@ public class UserServiceImpl implements UserService {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper.eq("username", username);
         if (userMapper.selectCount(wrapper) > 0) {
-            throw new RuntimeException("用户名已存在");
+            throw new UsernameAlreadyExistsException("用户名已存在");
         }
 
         User user = new User();

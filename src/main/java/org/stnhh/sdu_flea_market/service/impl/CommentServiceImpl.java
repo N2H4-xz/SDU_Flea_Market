@@ -10,6 +10,9 @@ import org.stnhh.sdu_flea_market.data.po.User;
 import org.stnhh.sdu_flea_market.data.vo.comment.CommentRequest;
 import org.stnhh.sdu_flea_market.data.vo.comment.CommentResponse;
 import org.stnhh.sdu_flea_market.data.vo.PageResponse;
+import org.stnhh.sdu_flea_market.exception.InvalidParameterException;
+import org.stnhh.sdu_flea_market.exception.ResourceNotFoundException;
+import org.stnhh.sdu_flea_market.exception.UnauthorizedException;
 import org.stnhh.sdu_flea_market.mapper.CommentMapper;
 import org.stnhh.sdu_flea_market.mapper.ProductMapper;
 import org.stnhh.sdu_flea_market.mapper.UserMapper;
@@ -35,12 +38,12 @@ public class CommentServiceImpl implements CommentService {
         // 验证商品是否存在且未被删除
         Product product = productMapper.selectById(productId);
         if (product == null || product.getIsDeleted()) {
-            throw new RuntimeException("商品不存在");
+            throw new ResourceNotFoundException("商品不存在");
         }
 
         // 验证留言内容不为空
         if (request.getContent() == null || request.getContent().trim().isEmpty()) {
-            throw new RuntimeException("留言内容不能为空");
+            throw new InvalidParameterException("留言内容不能为空");
         }
 
         // 创建留言
@@ -60,7 +63,7 @@ public class CommentServiceImpl implements CommentService {
         // 验证商品是否存在且未被删除
         Product product = productMapper.selectById(productId);
         if (product == null || product.getIsDeleted()) {
-            throw new RuntimeException("商品不存在");
+            throw new ResourceNotFoundException("商品不存在");
         }
 
         // 构建查询条件
@@ -115,12 +118,12 @@ public class CommentServiceImpl implements CommentService {
         // 查询留言
         Comment comment = commentMapper.selectById(commentId);
         if (comment == null) {
-            throw new RuntimeException("留言不存在");
+            throw new ResourceNotFoundException("留言不存在");
         }
 
         // 验证用户权限：只有留言作者可以删除
         if (!comment.getAuthorId().equals(userId)) {
-            throw new RuntimeException("无权限删除此留言");
+            throw new UnauthorizedException("无权限");
         }
 
         // 删除留言

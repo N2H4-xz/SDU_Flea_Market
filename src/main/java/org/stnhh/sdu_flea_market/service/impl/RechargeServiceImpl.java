@@ -37,9 +37,8 @@ public class RechargeServiceImpl implements RechargeService {
         QueryWrapper<Recharge> wrapper = new QueryWrapper<>();
         wrapper.eq("user_id", userId);
 
-        if (status != null && !status.isEmpty()) {
-            wrapper.eq("status", status);
-        }
+        // 注意：Recharge 表中没有 status 字段，status 参数被忽略
+        // 如果需要按状态筛选，请在后续版本中添加 status 字段
 
         wrapper.orderByDesc("created_at");
 

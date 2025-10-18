@@ -11,6 +11,8 @@ import org.stnhh.sdu_flea_market.data.vo.product.ProductRequest;
 import org.stnhh.sdu_flea_market.data.vo.product.ProductResponse;
 import org.stnhh.sdu_flea_market.data.vo.product.ProductListResponse;
 import org.stnhh.sdu_flea_market.data.vo.PageResponse;
+import org.stnhh.sdu_flea_market.exception.ResourceNotFoundException;
+import org.stnhh.sdu_flea_market.exception.UnauthorizedException;
 import org.stnhh.sdu_flea_market.mapper.ProductMapper;
 import org.stnhh.sdu_flea_market.mapper.ProductImageMapper;
 import org.stnhh.sdu_flea_market.mapper.UserMapper;
@@ -56,7 +58,7 @@ public class ProductServiceImpl implements ProductService {
         // 查询商品信息
         Product product = productMapper.selectById(productId);
         if (product == null || product.getIsDeleted()) {
-            throw new RuntimeException("商品不存在");
+            throw new ResourceNotFoundException("商品不存在");
         }
 
         // 增加浏览次数
@@ -181,15 +183,18 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse updateProduct(Long productId, Long sellerId, ProductRequest request) {
         Product product = productMapper.selectById(productId);
-        if (product == null || !product.getSellerId().equals(sellerId)) {
-            throw new RuntimeException("无权限修改此商品");
+        if (product == null) {
+            throw new ResourceNotFoundException("商品不存在");
+        }
+        if (!product.getSellerId().equals(sellerId)) {
+            throw new UnauthorizedException("无权限");
         }
 
         if (request.getTitle() != null) product.setTitle(request.getTitle());
         if (request.getDescription() != null) product.setDescription(request.getDescription());
         if (request.getCategory() != null) product.setCategory(request.getCategory());
         if (request.getPrice() != null) product.setPrice(request.getPrice());
-        if (request.getCondition() != null) product.setCondition(request.getCondition());
+        if (request.getCondition() != null) product.setItemCondition(request.getCondition());
         if (request.getCampus() != null) product.setCampus(request.getCampus());
 
         product.setUpdatedAt(LocalDateTime.now());
@@ -201,8 +206,11 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void deleteProduct(Long productId, Long sellerId) {
         Product product = productMapper.selectById(productId);
-        if (product == null || !product.getSellerId().equals(sellerId)) {
-            throw new RuntimeException("无权限删除此商品");
+        if (product == null) {
+            throw new ResourceNotFoundException("商品不存在");
+        }
+        if (!product.getSellerId().equals(sellerId)) {
+            throw new UnauthorizedException("无权限");
         }
 
         product.setIsDeleted(true);
