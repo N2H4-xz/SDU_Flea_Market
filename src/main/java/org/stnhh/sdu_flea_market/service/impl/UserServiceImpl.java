@@ -8,6 +8,8 @@ import org.stnhh.sdu_flea_market.data.po.User;
 import org.stnhh.sdu_flea_market.data.vo.auth.LoginResponse;
 import org.stnhh.sdu_flea_market.data.vo.user.UserProfileResponse;
 import org.stnhh.sdu_flea_market.data.vo.user.UpdateProfileRequest;
+import org.stnhh.sdu_flea_market.exception.InvalidParameterException;
+import org.stnhh.sdu_flea_market.exception.ResourceNotFoundException;
 import org.stnhh.sdu_flea_market.exception.UsernameAlreadyExistsException;
 import org.stnhh.sdu_flea_market.mapper.UserMapper;
 import org.stnhh.sdu_flea_market.service.UserService;
@@ -31,10 +33,10 @@ public class UserServiceImpl implements UserService {
     public User register(String username, String password) {
         // 验证用户名和密码不为空
         if (username == null || username.trim().isEmpty()) {
-            throw new RuntimeException("用户名不能为空");
+            throw new InvalidParameterException("用户名不能为空");
         }
         if (password == null || password.trim().isEmpty()) {
-            throw new RuntimeException("密码不能为空");
+            throw new InvalidParameterException("密码不能为空");
         }
 
         // 检查用户名是否已存在
@@ -64,14 +66,14 @@ public class UserServiceImpl implements UserService {
             wrapper.eq("username", username);
 
         } else {
-            throw new RuntimeException("用户名不能为空");
+            throw new InvalidParameterException("用户名不能为空");
         }
 
         User user = userMapper.selectOne(wrapper);
 
         // 验证用户存在且密码正确
         if (user == null || !BCrypt.checkpw(password, user.getPasswordHash())) {
-            throw new RuntimeException("用户名或密码错误");
+            throw new InvalidParameterException("用户名或密码错误");
         }
 
         // 生成JWT令牌
@@ -96,7 +98,7 @@ public class UserServiceImpl implements UserService {
     public UserProfileResponse getProfile(Long userId) {
         User user = userMapper.selectById(userId);
         if (user == null) {
-            throw new RuntimeException("用户不存在");
+            throw new ResourceNotFoundException("用户不存在");
         }
 
         UserProfileResponse response = new UserProfileResponse();
@@ -119,7 +121,7 @@ public class UserServiceImpl implements UserService {
     public UserProfileResponse updateProfile(Long userId, UpdateProfileRequest request) {
         User user = userMapper.selectById(userId);
         if (user == null) {
-            throw new RuntimeException("用户不存在");
+            throw new ResourceNotFoundException("用户不存在");
         }
 
         if (request.getNickname() != null) user.setNickname(request.getNickname());
@@ -140,11 +142,11 @@ public class UserServiceImpl implements UserService {
     public void changePassword(Long userId, String oldPassword, String newPassword) {
         User user = userMapper.selectById(userId);
         if (user == null) {
-            throw new RuntimeException("用户不存在");
+            throw new ResourceNotFoundException("用户不存在");
         }
 
         if (!BCrypt.checkpw(oldPassword, user.getPasswordHash())) {
-            throw new RuntimeException("旧密码错误");
+            throw new InvalidParameterException("旧密码错误");
         }
 
         user.setPasswordHash(BCrypt.hashpw(newPassword, BCrypt.gensalt()));

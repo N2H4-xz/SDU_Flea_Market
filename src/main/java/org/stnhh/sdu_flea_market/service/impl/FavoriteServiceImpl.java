@@ -8,6 +8,8 @@ import org.stnhh.sdu_flea_market.data.po.Favorite;
 import org.stnhh.sdu_flea_market.data.po.Product;
 import org.stnhh.sdu_flea_market.data.vo.favorite.FavoriteResponse;
 import org.stnhh.sdu_flea_market.data.vo.PageResponse;
+import org.stnhh.sdu_flea_market.exception.BusinessConflictException;
+import org.stnhh.sdu_flea_market.exception.ResourceNotFoundException;
 import org.stnhh.sdu_flea_market.mapper.FavoriteMapper;
 import org.stnhh.sdu_flea_market.mapper.ProductMapper;
 import org.stnhh.sdu_flea_market.service.FavoriteService;
@@ -29,14 +31,14 @@ public class FavoriteServiceImpl implements FavoriteService {
         // 验证商品是否存在且未被删除
         Product product = productMapper.selectById(productId);
         if (product == null || product.getIsDeleted()) {
-            throw new RuntimeException("商品不存在");
+            throw new ResourceNotFoundException("商品不存在");
         }
 
         // 检查是否已经收藏过此商品
         QueryWrapper<Favorite> wrapper = new QueryWrapper<>();
         wrapper.eq("user_id", userId).eq("product_id", productId);
         if (favoriteMapper.selectCount(wrapper) > 0) {
-            throw new RuntimeException("已收藏此商品");
+            throw new BusinessConflictException("已收藏此商品");
         }
 
         // 创建收藏记录
@@ -55,7 +57,7 @@ public class FavoriteServiceImpl implements FavoriteService {
         QueryWrapper<Favorite> wrapper = new QueryWrapper<>();
         wrapper.eq("user_id", userId).eq("product_id", productId);
         if (favoriteMapper.selectCount(wrapper) == 0) {
-            throw new RuntimeException("收藏不存在");
+            throw new ResourceNotFoundException("收藏不存在");
         }
 
         // 删除收藏记录
