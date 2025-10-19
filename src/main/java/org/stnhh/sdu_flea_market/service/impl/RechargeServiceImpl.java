@@ -10,6 +10,7 @@ import org.stnhh.sdu_flea_market.data.vo.recharge.RechargeResponse;
 import org.stnhh.sdu_flea_market.data.vo.PageResponse;
 import org.stnhh.sdu_flea_market.mapper.RechargeMapper;
 import org.stnhh.sdu_flea_market.service.RechargeService;
+import org.stnhh.sdu_flea_market.service.UserWalletService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +21,9 @@ public class RechargeServiceImpl implements RechargeService {
     @Autowired
     private RechargeMapper rechargeMapper;
 
+    @Autowired
+    private UserWalletService userWalletService;
+
     @Override
     public Recharge createRecharge(Long userId, RechargeRequest request) {
         Recharge recharge = new Recharge();
@@ -29,6 +33,10 @@ public class RechargeServiceImpl implements RechargeService {
         recharge.setUpdatedAt(LocalDateTime.now());
 
         rechargeMapper.insert(recharge);
+
+        // ✅ 充值成功后，增加用户余额
+        userWalletService.addBalance(userId, userId, request.getAmount());
+
         return recharge;
     }
 

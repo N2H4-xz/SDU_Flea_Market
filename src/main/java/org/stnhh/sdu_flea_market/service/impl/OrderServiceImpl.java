@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.stnhh.sdu_flea_market.data.po.Order;
 import org.stnhh.sdu_flea_market.data.po.Product;
+import org.stnhh.sdu_flea_market.data.po.ProductImage;
 import org.stnhh.sdu_flea_market.data.vo.order.OrderRequest;
 import org.stnhh.sdu_flea_market.data.vo.order.OrderResponse;
 import org.stnhh.sdu_flea_market.data.vo.PageResponse;
@@ -14,7 +15,9 @@ import org.stnhh.sdu_flea_market.exception.ResourceNotFoundException;
 import org.stnhh.sdu_flea_market.exception.UnauthorizedException;
 import org.stnhh.sdu_flea_market.mapper.OrderMapper;
 import org.stnhh.sdu_flea_market.mapper.ProductMapper;
+import org.stnhh.sdu_flea_market.mapper.ProductImageMapper;
 import org.stnhh.sdu_flea_market.service.OrderService;
+import org.stnhh.sdu_flea_market.service.UserWalletService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,6 +30,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private ProductMapper productMapper;
+
+    @Autowired
+    private ProductImageMapper productImageMapper;
+
+    @Autowired
+    private UserWalletService userWalletService;
 
     @Override
     public Order createOrder(Long buyerId, OrderRequest request) {
@@ -41,6 +50,17 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessConflictException("不能购买自己的商品");
         }
 
+        // 检查同一个人对同一件商品是否已有正在进行的订单
+        QueryWrapper<Order> existingOrderWrapper = new QueryWrapper<>();
+        existingOrderWrapper.eq("buyer_id", buyerId)
+                .eq("product_id", request.getProduct_id())
+                .in("order_status", "pending_payment", "paid");
+
+        long existingOrderCount = orderMapper.selectCount(existingOrderWrapper);
+        if (existingOrderCount > 0) {
+            throw new BusinessConflictException("该商品已有正在进行的订单，请先完成或取消之前的订单");
+        }
+
         // 创建订单
         Order order = new Order();
         order.setProductId(request.getProduct_id());
@@ -48,12 +68,11 @@ public class OrderServiceImpl implements OrderService {
         order.setSellerId(product.getSellerId());
         order.setAmount(product.getPrice());
         order.setOrderStatus("pending_payment");
-        order.setPaymentMethod("online");  // 默认在线支付
-        order.setQuantity(request.getQuantity() != null ? request.getQuantity() : 1);
         order.setCreatedAt(LocalDateTime.now());
         order.setUpdatedAt(LocalDateTime.now());
 
         orderMapper.insert(order);
+
         return order;
     }
 
@@ -129,11 +148,9 @@ public class OrderServiceImpl implements OrderService {
 
         // 验证状态转换的有效性
         String currentStatus = order.getOrderStatus();
-        if ("pending_payment".equals(currentStatus) && "paid".equals(newStatus)) {
-            // 允许：待支付 -> 已支付
-        } else if ("paid".equals(currentStatus) && "completed".equals(newStatus)) {
-            // 允许：已支付 -> 已完成
-        } else if (("pending_payment".equals(currentStatus) || "paid".equals(currentStatus)) && "cancelled".equals(newStatus)) {
+        if ("pending_payment".equals(currentStatus) && "completed".equals(newStatus)) {
+            // 允许：待支付 -> 已完成
+        } else if (("pending_payment".equals(currentStatus)) && "cancelled".equals(newStatus)) {
             // 允许：待支付或已支付 -> 已取消
         } else if (!"cancelled".equals(currentStatus) && !"completed".equals(currentStatus)) {
             // 防止已取消或已完成的订单再次更新
@@ -142,15 +159,49 @@ public class OrderServiceImpl implements OrderService {
 
         // 更新订单状态
         order.setOrderStatus(newStatus);
-        if ("paid".equals(newStatus)) {
+        if ("completed".equals(newStatus)) {
             order.setPaidAt(LocalDateTime.now());
-        } else if ("completed".equals(newStatus)) {
             order.setCompletedAt(LocalDateTime.now());
+
+            // ✅ 卖家接受订单时的处理
+            // 1. 检查买家余额是否充足，如果充足则扣钱
+            userWalletService.deductBalance(order.getBuyerId(), order.getBuyerId(), order.getAmount());
+
+            // 2. 给卖家钱包转钱
+            userWalletService.addBalance(order.getSellerId(), order.getSellerId(), order.getAmount());
+
+            // 3. 下架商品（设置为删除）
+            Product product = productMapper.selectById(order.getProductId());
+            if (product != null) {
+                product.setIsDeleted(true);
+                product.setUpdatedAt(LocalDateTime.now());
+                productMapper.updateById(product);
+            }
+
+            // 4. 取消其他针对同一商品的订单
+            cancelOtherOrdersForProduct(order.getProductId(), order.getUid());
         }
         order.setUpdatedAt(LocalDateTime.now());
 
         orderMapper.updateById(order);
         return convertToResponse(order);
+    }
+
+    /**
+     * 取消所有针对同一商品的其他订单
+     */
+    private void cancelOtherOrdersForProduct(Long productId, Long acceptedOrderId) {
+        QueryWrapper<Order> wrapper = new QueryWrapper<>();
+        wrapper.eq("product_id", productId)
+                .ne("uid", acceptedOrderId)
+                .in("order_status", "pending_payment", "paid");
+
+        List<Order> ordersToCancel = orderMapper.selectList(wrapper);
+        for (Order order : ordersToCancel) {
+            order.setOrderStatus("cancelled");
+            order.setUpdatedAt(LocalDateTime.now());
+            orderMapper.updateById(order);
+        }
     }
 
     private OrderResponse convertToResponse(Order order) {
@@ -161,15 +212,29 @@ public class OrderServiceImpl implements OrderService {
         response.setSeller_id(order.getSellerId());
         response.setAmount(order.getAmount());
         response.setStatus(order.getOrderStatus());
-        response.setPayment_method(order.getPaymentMethod());
         response.setCreated_at(order.getCreatedAt());
         response.setPaid_at(order.getPaidAt());
         response.setCompleted_at(order.getCompletedAt());
 
-        // 获取商品标题
+        // 获取商品标题和照片
         Product product = productMapper.selectById(order.getProductId());
         if (product != null) {
             response.setProduct_title(product.getTitle());
+
+            // 获取商品缩略图
+            QueryWrapper<ProductImage> imageWrapper = new QueryWrapper<>();
+            imageWrapper.eq("product_id", order.getProductId()).eq("is_thumbnail", true);
+            ProductImage thumbnail = productImageMapper.selectOne(imageWrapper);
+
+            // ✅ 如果有缩略图，加上 URL 前缀；否则返回默认图片
+            if (thumbnail != null && thumbnail.getImageUrl() != null && !thumbnail.getImageUrl().isEmpty()) {
+                response.setProduct_image("http://154.36.178.147:15634/" + thumbnail.getImageUrl());
+            } else {
+                response.setProduct_image("http://154.36.178.147:15634/defaultProduct.jpg");
+            }
+        } else {
+            // 商品不存在时，返回默认图片
+            response.setProduct_image("http://154.36.178.147:15634/defaultProduct.jpg");
         }
 
         return response;

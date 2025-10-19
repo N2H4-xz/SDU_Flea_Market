@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.stnhh.sdu_flea_market.data.po.Product;
 import org.stnhh.sdu_flea_market.data.po.ProductImage;
 import org.stnhh.sdu_flea_market.data.po.User;
@@ -13,10 +14,13 @@ import org.stnhh.sdu_flea_market.data.vo.product.ProductListResponse;
 import org.stnhh.sdu_flea_market.data.vo.PageResponse;
 import org.stnhh.sdu_flea_market.exception.ResourceNotFoundException;
 import org.stnhh.sdu_flea_market.exception.UnauthorizedException;
+import org.stnhh.sdu_flea_market.exception.InvalidParameterException;
 import org.stnhh.sdu_flea_market.mapper.ProductMapper;
 import org.stnhh.sdu_flea_market.mapper.ProductImageMapper;
 import org.stnhh.sdu_flea_market.mapper.UserMapper;
 import org.stnhh.sdu_flea_market.service.ProductService;
+import org.stnhh.sdu_flea_market.utils.FileUploadUtil;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,6 +54,27 @@ public class ProductServiceImpl implements ProductService {
         product.setUpdatedAt(LocalDateTime.now());
 
         productMapper.insert(product);
+
+        // 处理图片上传
+        if (request.getImages() != null && request.getImages().length > 0) {
+            try {
+                List<String> fileNames = FileUploadUtil.uploadFiles(request.getImages());
+
+                // 保存图片信息到数据库
+                for (int i = 0; i < fileNames.size(); i++) {
+                    ProductImage image = new ProductImage();
+                    image.setProductId(product.getUid());
+                    image.setImageUrl(fileNames.get(i)); // 保存文件名
+                    image.setIsThumbnail(i == 0); // 第一张图片作为缩略图
+                    image.setSortOrder(i);
+                    image.setCreatedAt(LocalDateTime.now());
+                    productImageMapper.insert(image);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("图片上传失败: " + e.getMessage());
+            }
+        }
+
         return product;
     }
 
@@ -68,7 +93,22 @@ public class ProductServiceImpl implements ProductService {
         // 获取商品图片列表
         QueryWrapper<ProductImage> imageWrapper = new QueryWrapper<>();
         imageWrapper.eq("product_id", productId).orderByAsc("sort_order");
+
         List<ProductImage> images = productImageMapper.selectList(imageWrapper);
+
+        // ✅ 为每张图片加上 URL 前缀，如果没有图片则返回默认图片
+        List<String> imageUrls = images.stream().map(img -> {
+            if (img.getImageUrl() != null && !img.getImageUrl().isEmpty()) {
+                return "http://154.36.178.147:15634/" + img.getImageUrl();
+            } else {
+                return "http://154.36.178.147:15634/defaultProduct.png";
+            }
+        }).collect(Collectors.toList());
+
+        // 如果没有图片，添加默认图片
+        if (imageUrls.isEmpty()) {
+            imageUrls.add("http://154.36.178.147:15634/defaultProduct.png");
+        }
 
         // 获取卖家信息
         User seller = userMapper.selectById(product.getSellerId());
@@ -82,7 +122,7 @@ public class ProductServiceImpl implements ProductService {
         response.setCondition(product.getItemCondition());
         response.setCategory(product.getCategory());
         response.setCampus(product.getCampus());
-        response.setImages(images.stream().map(ProductImage::getImageUrl).collect(Collectors.toList()));
+        response.setImages(imageUrls);
         response.setStatus(product.getProductStatus());
         response.setView_count(product.getViewCount());
         response.setCreated_at(product.getCreatedAt());
@@ -93,7 +133,14 @@ public class ProductServiceImpl implements ProductService {
             ProductResponse.SellerInfo sellerInfo = new ProductResponse.SellerInfo();
             sellerInfo.setUser_id(seller.getUid());
             sellerInfo.setNickname(seller.getNickname());
-            sellerInfo.setAvatar(seller.getAvatar());
+
+            // ✅ 如果有头像，加上 URL 前缀；否则返回默认头像
+            if (seller.getAvatar() != null && !seller.getAvatar().isEmpty()) {
+                sellerInfo.setAvatar("http://154.36.178.147:15634/" + seller.getAvatar());
+            } else {
+                sellerInfo.setAvatar("http://154.36.178.147:15634/defaultProduct.png");
+            }
+
             sellerInfo.setCampus(seller.getCampus());
             sellerInfo.setPhone(seller.getPhone());
             sellerInfo.setWechat(seller.getWechat());
@@ -156,8 +203,12 @@ public class ProductServiceImpl implements ProductService {
             QueryWrapper<ProductImage> imageWrapper = new QueryWrapper<>();
             imageWrapper.eq("product_id", product.getUid()).eq("is_thumbnail", true);
             ProductImage thumbnail = productImageMapper.selectOne(imageWrapper);
-            if (thumbnail != null) {
-                item.setThumbnail(thumbnail.getImageUrl());
+
+            // ✅ 如果有缩略图，加上 URL 前缀；否则返回默认图片
+            if (thumbnail != null && thumbnail.getImageUrl() != null && !thumbnail.getImageUrl().isEmpty()) {
+                item.setThumbnail("http://154.36.178.147:15634/" + thumbnail.getImageUrl());
+            } else {
+                item.setThumbnail("http://154.36.178.147:15634/defaultProduct.png");
             }
 
             // 获取卖家昵称
@@ -196,6 +247,36 @@ public class ProductServiceImpl implements ProductService {
         if (request.getPrice() != null) product.setPrice(request.getPrice());
         if (request.getCondition() != null) product.setItemCondition(request.getCondition());
         if (request.getCampus() != null) product.setCampus(request.getCampus());
+
+        // 处理图片更新
+        if (request.getImages() != null && request.getImages().length > 0) {
+            try {
+                // 删除旧图片
+                QueryWrapper<ProductImage> oldImageWrapper = new QueryWrapper<>();
+                oldImageWrapper.eq("product_id", productId);
+                List<ProductImage> oldImages = productImageMapper.selectList(oldImageWrapper);
+                for (ProductImage oldImage : oldImages) {
+                    FileUploadUtil.deleteFile(oldImage.getImageUrl());
+                }
+                productImageMapper.delete(oldImageWrapper);
+
+                // 上传新图片
+                List<String> fileNames = FileUploadUtil.uploadFiles(request.getImages());
+
+                // 保存新图片信息到数据库
+                for (int i = 0; i < fileNames.size(); i++) {
+                    ProductImage image = new ProductImage();
+                    image.setProductId(productId);
+                    image.setImageUrl(fileNames.get(i)); // 保存文件名
+                    image.setIsThumbnail(i == 0); // 第一张图片作为缩略图
+                    image.setSortOrder(i);
+                    image.setCreatedAt(LocalDateTime.now());
+                    productImageMapper.insert(image);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("图片上传失败: " + e.getMessage());
+            }
+        }
 
         product.setUpdatedAt(LocalDateTime.now());
         productMapper.updateById(product);

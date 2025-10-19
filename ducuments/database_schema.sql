@@ -85,7 +85,6 @@ CREATE TABLE IF NOT EXISTS `orders` (
   `amount` DECIMAL(10, 2) NOT NULL COMMENT '订单金额',
   `quantity` INT DEFAULT 1 COMMENT '购买数量',
   `order_status` ENUM('pending_payment', 'paid', 'completed', 'cancelled') DEFAULT 'pending_payment' COMMENT '订单状态',
-  `payment_method` ENUM('online', 'offline') NOT NULL COMMENT '支付方式',
   `paid_at` TIMESTAMP NULL COMMENT '支付时间',
   `completed_at` TIMESTAMP NULL COMMENT '完成时间',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',

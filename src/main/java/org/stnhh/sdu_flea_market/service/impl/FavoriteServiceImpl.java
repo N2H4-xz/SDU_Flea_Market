@@ -76,6 +76,15 @@ public class FavoriteServiceImpl implements FavoriteService {
             response.setFavorite_id(favorite.getUid());
             response.setProduct_id(favorite.getProductId());
             response.setCreated_at(favorite.getCreatedAt());
+
+            // 获取商品是否被删除
+            Product product = productMapper.selectById(favorite.getProductId());
+            if (product != null) {
+                response.setIs_deleted(product.getIsDeleted());
+            } else {
+                response.setIs_deleted(true); // 商品不存在，视为已删除
+            }
+
             return response;
         }).collect(Collectors.toList());
 

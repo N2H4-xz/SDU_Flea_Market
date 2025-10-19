@@ -3,6 +3,7 @@ package org.stnhh.sdu_flea_market.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.stnhh.sdu_flea_market.annotation.Auth;
 import org.stnhh.sdu_flea_market.data.po.Product;
 import org.stnhh.sdu_flea_market.data.vo.Result;
@@ -22,9 +23,26 @@ public class ProductController {
 
     @Auth
     @PostMapping
-    public ResponseEntity<Result> createProduct(@RequestBody ProductRequest request) {
+    public ResponseEntity<Result> createProduct(
+            @RequestParam String title,
+            @RequestParam String description,
+            @RequestParam String category,
+            @RequestParam String price,
+            @RequestParam String condition,
+            @RequestParam String campus,
+            @RequestParam(value = "images", required = false) MultipartFile[] images) {
         // 从请求上下文中获取userId（由AuthAspect设置）
         Long sellerId = AuthContextUtil.getUserId();
+
+        // 创建 ProductRequest
+        ProductRequest request = new ProductRequest();
+        request.setTitle(title);
+        request.setDescription(description);
+        request.setCategory(category);
+        request.setPrice(new java.math.BigDecimal(price));
+        request.setCondition(condition);
+        request.setCampus(campus);
+        request.setImages(images);
 
         // 创建商品
         Product product = productService.createProduct(sellerId, request);
@@ -54,9 +72,27 @@ public class ProductController {
 
     @Auth
     @PutMapping("/{productId}")
-    public ResponseEntity<Result> updateProduct(@PathVariable Long productId, @RequestBody ProductRequest request) {
+    public ResponseEntity<Result> updateProduct(
+            @PathVariable Long productId,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String price,
+            @RequestParam(required = false) String condition,
+            @RequestParam(required = false) String campus,
+            @RequestParam(value = "images", required = false) MultipartFile[] images) {
         // 从请求上下文中获取userId（由AuthAspect设置）
         Long sellerId = AuthContextUtil.getUserId();
+
+        // 创建 ProductRequest
+        ProductRequest request = new ProductRequest();
+        if (title != null) request.setTitle(title);
+        if (description != null) request.setDescription(description);
+        if (category != null) request.setCategory(category);
+        if (price != null) request.setPrice(new java.math.BigDecimal(price));
+        if (condition != null) request.setCondition(condition);
+        if (campus != null) request.setCampus(campus);
+        if (images != null) request.setImages(images);
 
         // 更新商品信息
         ProductResponse response = productService.updateProduct(productId, sellerId, request);

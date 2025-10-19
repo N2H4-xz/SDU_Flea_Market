@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 public class FavoriteResponse {
     private Long favorite_id;
     private Long product_id;
+    private Boolean is_deleted; // 商品是否被删除
     private LocalDateTime created_at;
 }
 

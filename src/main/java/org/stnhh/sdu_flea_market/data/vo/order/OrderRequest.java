@@ -9,6 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class OrderRequest {
     private Long product_id;
-    private Integer quantity;
 }
 

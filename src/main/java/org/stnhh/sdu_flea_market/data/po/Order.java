@@ -22,8 +22,6 @@ public class Order {
     private Long sellerId;
     private BigDecimal amount;
     private String orderStatus; // pending_payment/paid/completed/cancelled
-    private String paymentMethod; // online/offline
-    private Integer quantity;
 
     private LocalDateTime createdAt;
     private LocalDateTime paidAt;

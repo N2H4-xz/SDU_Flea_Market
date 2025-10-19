@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.stnhh.sdu_flea_market.data.po.User;
 import org.stnhh.sdu_flea_market.data.vo.auth.LoginResponse;
 import org.stnhh.sdu_flea_market.data.vo.user.UserProfileResponse;
@@ -14,7 +15,9 @@ import org.stnhh.sdu_flea_market.exception.UsernameAlreadyExistsException;
 import org.stnhh.sdu_flea_market.mapper.UserMapper;
 import org.stnhh.sdu_flea_market.service.UserService;
 import org.stnhh.sdu_flea_market.utils.JWTUtil;
+import org.stnhh.sdu_flea_market.utils.FileUploadUtil;
 import org.stnhh.sdu_flea_market.cache.IGlobalCache;
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Service
@@ -104,7 +107,14 @@ public class UserServiceImpl implements UserService {
         UserProfileResponse response = new UserProfileResponse();
         response.setUser_id(user.getUid());
         response.setUsername(user.getUsername());
-        response.setAvatar(user.getAvatar());
+
+        // ✅ 如果有头像，加上 URL 前缀；否则返回默认头像
+        if (user.getAvatar() != null && !user.getAvatar().isEmpty()) {
+            response.setAvatar("http://154.36.178.147:15634/" + user.getAvatar());
+        } else {
+            response.setAvatar("http://154.36.178.147:15634/default.jpg");
+        }
+
         response.setNickname(user.getNickname());
         response.setCampus(user.getCampus());
         response.setMajor(user.getMajor());
@@ -125,7 +135,23 @@ public class UserServiceImpl implements UserService {
         }
 
         if (request.getNickname() != null) user.setNickname(request.getNickname());
-        if (request.getAvatar() != null) user.setAvatar(request.getAvatar());
+
+        // 处理头像上传
+        if (request.getAvatar() != null && !request.getAvatar().isEmpty()) {
+            try {
+                // 删除旧头像
+                if (user.getAvatar() != null && !user.getAvatar().isEmpty()) {
+                    FileUploadUtil.deleteFile(user.getAvatar());
+                }
+
+                // 上传新头像
+                String avatarFileName = FileUploadUtil.uploadFile(request.getAvatar());
+                user.setAvatar(avatarFileName);  // 保存文件名
+            } catch (IOException e) {
+                throw new RuntimeException("头像上传失败: " + e.getMessage());
+            }
+        }
+
         if (request.getCampus() != null) user.setCampus(request.getCampus());
         if (request.getMajor() != null) user.setMajor(request.getMajor());
         if (request.getPhone() != null) user.setPhone(request.getPhone());
