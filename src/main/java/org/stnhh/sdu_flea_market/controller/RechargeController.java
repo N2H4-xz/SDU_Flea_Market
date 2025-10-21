@@ -14,6 +14,7 @@ import org.stnhh.sdu_flea_market.service.RechargeService;
 import org.stnhh.sdu_flea_market.service.UserWalletService;
 import org.stnhh.sdu_flea_market.utils.AuthContextUtil;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/recharge")
 public class RechargeController {

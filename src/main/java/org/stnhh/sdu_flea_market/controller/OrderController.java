@@ -13,6 +13,7 @@ import org.stnhh.sdu_flea_market.data.vo.PageResponse;
 import org.stnhh.sdu_flea_market.service.OrderService;
 import org.stnhh.sdu_flea_market.utils.AuthContextUtil;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/orders")
 public class OrderController {

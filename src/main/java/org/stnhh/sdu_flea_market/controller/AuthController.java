@@ -13,6 +13,7 @@ import org.stnhh.sdu_flea_market.data.vo.auth.RegisterRequest;
 import org.stnhh.sdu_flea_market.service.UserService;
 import org.stnhh.sdu_flea_market.utils.AuthContextUtil;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/auth")
 public class AuthController {

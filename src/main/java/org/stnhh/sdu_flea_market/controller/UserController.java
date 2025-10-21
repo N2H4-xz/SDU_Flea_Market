@@ -11,6 +11,7 @@ import org.stnhh.sdu_flea_market.data.vo.user.UserProfileResponse;
 import org.stnhh.sdu_flea_market.service.UserService;
 import org.stnhh.sdu_flea_market.utils.AuthContextUtil;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/users")
 public class UserController {

@@ -14,6 +14,7 @@ import org.stnhh.sdu_flea_market.data.vo.PageResponse;
 import org.stnhh.sdu_flea_market.service.ProductService;
 import org.stnhh.sdu_flea_market.utils.AuthContextUtil;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/products")
 public class ProductController {
