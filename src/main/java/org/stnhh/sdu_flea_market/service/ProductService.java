@@ -10,7 +10,7 @@ public interface ProductService {
     Product createProduct(Long sellerId, ProductRequest request);
     ProductResponse getProductDetail(Long productId);
     PageResponse<ProductListResponse> listProducts(Integer page, Integer limit, String keyword,
-                                                    String category, String campus, String sort, String condition);
+                                                    String category, String campus, String sort, String condition, Long sellerId);
     ProductResponse updateProduct(Long productId, Long sellerId, ProductRequest request);
     void deleteProduct(Long productId, Long sellerId);
 }
