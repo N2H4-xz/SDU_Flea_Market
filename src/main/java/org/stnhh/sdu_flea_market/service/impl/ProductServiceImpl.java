@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.stnhh.sdu_flea_market.data.Config;
 import org.stnhh.sdu_flea_market.data.po.Product;
@@ -39,6 +40,7 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private UserMapper userMapper;
 
+    @Transactional
     @Override
     public Product createProduct(Long sellerId, ProductRequest request) {
         Product product = new Product();
@@ -84,7 +86,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse getProductDetail(Long productId) {
         // 查询商品信息
         Product product = productMapper.selectById(productId);
-        if (product == null || product.getIsDeleted()) {
+        if (product == null || product.getIsDeleted() || product.getProductStatus() != 0) {
             throw new ResourceNotFoundException("商品不存在");
         }
 
@@ -154,10 +156,17 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public PageResponse<ProductListResponse> listProducts(Integer page, Integer limit, String keyword,
-                                                          String category, String campus, String sort, String condition, Long sellerId) {
-        // 构建查询条件：只查询未删除且状态为活跃的商品
+                                                          String category, String campus, String sort, String condition, Long sellerId, Integer status) {
+        // 构建查询条件：只查询未删除的商品
         QueryWrapper<Product> wrapper = new QueryWrapper<>();
-        wrapper.eq("is_deleted", false).eq("product_status", 0);
+        wrapper.eq("is_deleted", false);
+
+        // 如果指定了状态，按状态筛选；否则默认只查询活跃商品
+        if (status != null) {
+            wrapper.eq("product_status", status);
+        } else {
+            wrapper.eq("product_status", 0); // 默认只查询活跃商品
+        }
 
         // 根据关键词搜索商品标题或描述
         if (keyword != null && !keyword.isEmpty()) {

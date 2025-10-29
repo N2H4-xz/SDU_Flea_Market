@@ -28,9 +28,9 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     @Override
     public Favorite addFavorite(Long userId, Long productId) {
-        // 验证商品是否存在且未被删除
+        // 验证商品是否存在、未被删除且状态为活跃
         Product product = productMapper.selectById(productId);
-        if (product == null || product.getIsDeleted()) {
+        if (product == null || product.getIsDeleted() || product.getProductStatus() != 0) {
             throw new ResourceNotFoundException("商品不存在");
         }
 
@@ -77,10 +77,11 @@ public class FavoriteServiceImpl implements FavoriteService {
             response.setProduct_id(favorite.getProductId());
             response.setCreated_at(favorite.getCreatedAt());
 
-            // 获取商品是否被删除
+            // 获取商品是否被删除或已卖出
             Product product = productMapper.selectById(favorite.getProductId());
             if (product != null) {
-                response.setIs_deleted(product.getIsDeleted());
+                // 如果商品被删除或已卖出，标记为已删除
+                response.setIs_deleted(product.getIsDeleted() || product.getProductStatus() != 0);
             } else {
                 response.setIs_deleted(true); // 商品不存在，视为已删除
             }

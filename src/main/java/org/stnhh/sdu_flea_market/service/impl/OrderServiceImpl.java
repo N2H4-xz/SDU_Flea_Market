@@ -162,13 +162,7 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderStatus(newStatus);
         
         if("paid".equals(newStatus)) {
-            order.setPaidAt(LocalDateTime.now());
-            // ✅买家支付订单时的处理
-            // 1. 检查买家余额是否充足，如果充足则扣钱
-            userWalletService.deductBalance(order.getBuyerId(), order.getBuyerId(), order.getAmount());
-            
-            // 2. 给卖家钱包转钱
-            userWalletService.addBalance(order.getSellerId(), order.getSellerId(), order.getAmount());
+
         }
         
         
@@ -177,12 +171,18 @@ public class OrderServiceImpl implements OrderService {
 
            
 
-            // 3. 下架商品（设置为删除）
+            // 3. 更新商品状态为已卖出
             Product product = productMapper.selectById(order.getProductId());
             if (product != null) {
-                product.setIsDeleted(true);
-                product.setProductStatus ( 1 );
+                product.setProductStatus(1); // 1 = sold（已卖出）
                 product.setUpdatedAt(LocalDateTime.now());
+                          order.setPaidAt(LocalDateTime.now());
+            // ✅买家支付订单时的处理
+            // 1. 检查买家余额是否充足，如果充足则扣钱
+            userWalletService.deductBalance(order.getBuyerId(), order.getBuyerId(), order.getAmount());
+            
+            // 2. 给卖家钱包转钱
+            userWalletService.addBalance(order.getSellerId(), order.getSellerId(), order.getAmount());
                 productMapper.updateById(product);
             }
 
