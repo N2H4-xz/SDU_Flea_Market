@@ -1,5 +1,6 @@
 package org.stnhh.sdu_flea_market.utils;
 
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
@@ -74,6 +75,7 @@ public class FileUploadUtil {
      * @return 保存的文件名列表
      * @throws IOException 文件操作异常
      */
+
     public static List<String> uploadFiles(MultipartFile[] files) throws IOException {
         List<String> fileNames = new ArrayList<>();
 
