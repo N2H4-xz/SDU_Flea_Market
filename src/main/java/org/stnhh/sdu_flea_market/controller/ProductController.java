@@ -82,7 +82,8 @@ public class ProductController {
             @RequestParam(required = false) String price,
             @RequestParam(required = false) String condition,
             @RequestParam(required = false) String campus,
-            @RequestParam(value = "images", required = false) MultipartFile[] images) {
+            @RequestParam(value = "images", required = false) MultipartFile[] images,
+            @RequestParam(value = "delete_images", required = false) String[] deleteImages) {
         // 从请求上下文中获取userId（由AuthAspect设置）
         Long sellerId = AuthContextUtil.getUserId();
 
@@ -95,7 +96,7 @@ public class ProductController {
         if (condition != null) request.setCondition(condition);
         if (campus != null) request.setCampus(campus);
         if (images != null) request.setImages(images);
-
+        if(deleteImages != null) request.setDeletedImages(deleteImages);
         // 更新商品信息
         ProductResponse response = productService.updateProduct(productId, sellerId, request);
         return Result.success(response, "商品更新成功");

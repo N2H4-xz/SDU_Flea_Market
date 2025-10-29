@@ -62,7 +62,7 @@ GET /products?page=1&limit=20
         "category": "电子产品",
         "status": 0,
         "created_at": "2025-10-19T10:00:00",
-        "thumbnail": "http://154.36.178.147:15634/image1.jpg",
+        "thumbnail": "http://154.36.178.147:15634(domain/image1.jpg",
         "seller_id": 2,
         "seller_nickname": "张三"
       },

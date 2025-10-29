@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.stnhh.sdu_flea_market.data.Config;
 import org.stnhh.sdu_flea_market.data.po.Product;
 import org.stnhh.sdu_flea_market.data.po.ProductImage;
 import org.stnhh.sdu_flea_market.data.po.User;
@@ -22,6 +23,7 @@ import org.stnhh.sdu_flea_market.service.ProductService;
 import org.stnhh.sdu_flea_market.utils.FileUploadUtil;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -99,15 +101,15 @@ public class ProductServiceImpl implements ProductService {
         // ✅ 为每张图片加上 URL 前缀，如果没有图片则返回默认图片
         List<String> imageUrls = images.stream().map(img -> {
             if (img.getImageUrl() != null && !img.getImageUrl().isEmpty()) {
-                return "http://154.36.178.147:15634/" + img.getImageUrl();
+                return Config.DOMAIN  + img.getImageUrl();
             } else {
-                return "http://154.36.178.147:15634/defaultProduct.png";
+                return Config.DOMAIN+"defaultProduct.png";
             }
         }).collect(Collectors.toList());
 
         // 如果没有图片，添加默认图片
         if (imageUrls.isEmpty()) {
-            imageUrls.add("http://154.36.178.147:15634/defaultProduct.png");
+            imageUrls.add(Config.DOMAIN+"defaultProduct.png");
         }
 
         // 获取卖家信息
@@ -136,9 +138,9 @@ public class ProductServiceImpl implements ProductService {
 
             // ✅ 如果有头像，加上 URL 前缀；否则返回默认头像
             if (seller.getAvatar() != null && !seller.getAvatar().isEmpty()) {
-                sellerInfo.setAvatar("http://154.36.178.147:15634/" + seller.getAvatar());
+                sellerInfo.setAvatar(Config.DOMAIN + seller.getAvatar());
             } else {
-                sellerInfo.setAvatar("http://154.36.178.147:15634/defaultProduct.png");
+                sellerInfo.setAvatar(Config.DOMAIN+"defaultProduct.png");
             }
 
             sellerInfo.setCampus(seller.getCampus());
@@ -210,9 +212,9 @@ public class ProductServiceImpl implements ProductService {
 
             // ✅ 如果有缩略图，加上 URL 前缀；否则返回默认图片
             if (thumbnail != null && thumbnail.getImageUrl() != null && !thumbnail.getImageUrl().isEmpty()) {
-                item.setThumbnail("http://154.36.178.147:15634/" + thumbnail.getImageUrl());
+                item.setThumbnail(Config.DOMAIN + thumbnail.getImageUrl());
             } else {
-                item.setThumbnail("http://154.36.178.147:15634/defaultProduct.png");
+                item.setThumbnail(Config.DOMAIN+"defaultProduct.png");
             }
 
             // 获取卖家昵称
@@ -256,13 +258,30 @@ public class ProductServiceImpl implements ProductService {
         if (request.getImages() != null && request.getImages().length > 0) {
             try {
                 // 删除旧图片
-                QueryWrapper<ProductImage> oldImageWrapper = new QueryWrapper<>();
-                oldImageWrapper.eq("product_id", productId);
-                List<ProductImage> oldImages = productImageMapper.selectList(oldImageWrapper);
-                for (ProductImage oldImage : oldImages) {
-                    FileUploadUtil.deleteFile(oldImage.getImageUrl());
+                List<String> deletedImages = Arrays.stream ( request.getDeletedImages () ).filter (
+                        oldImage -> oldImage.startsWith ( Config.DOMAIN )
+                ).map (
+                        oldImage -> oldImage.substring ( Config.DOMAIN.length () )
+                ).toList();
+                if ( !deletedImages.isEmpty () ) {
+                    
+                    for (String oldImage : deletedImages) {
+                        
+                                            // 删库 放进来虽然会慢但是安全
+                        QueryWrapper<ProductImage> deleteWrapper = new QueryWrapper<>();
+                        deleteWrapper.eq("product_id", productId)
+                                .eq("image_url", oldImage);
+                        if( productImageMapper.delete(deleteWrapper)>0)
+                            // 删文件
+                            FileUploadUtil.deleteFile(oldImage);
+                    }
+                    
+//                    // 删库
+//                    QueryWrapper<ProductImage> deleteWrapper = new QueryWrapper<>();
+//                    deleteWrapper.eq("product_id", productId)
+//                            .in("image_url", Arrays.asList(deletedImages));
+//                    productImageMapper.delete(deleteWrapper);
                 }
-                productImageMapper.delete(oldImageWrapper);
 
                 // 上传新图片
                 List<String> fileNames = FileUploadUtil.uploadFiles(request.getImages());

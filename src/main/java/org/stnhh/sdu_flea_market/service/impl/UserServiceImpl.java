@@ -5,6 +5,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.stnhh.sdu_flea_market.data.Config;
 import org.stnhh.sdu_flea_market.data.po.User;
 import org.stnhh.sdu_flea_market.data.vo.auth.LoginResponse;
 import org.stnhh.sdu_flea_market.data.vo.user.UserProfileResponse;
@@ -110,9 +111,9 @@ public class UserServiceImpl implements UserService {
 
         // ✅ 如果有头像，加上 URL 前缀；否则返回默认头像
         if (user.getAvatar() != null && !user.getAvatar().isEmpty()) {
-            response.setAvatar("http://154.36.178.147:15634/" + user.getAvatar());
+            response.setAvatar( Config.DOMAIN + user.getAvatar());
         } else {
-            response.setAvatar("http://154.36.178.147:15634/default.jpg");
+            response.setAvatar(Config.DOMAIN+"default.jpg");
         }
 
         response.setNickname(user.getNickname());
