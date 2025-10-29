@@ -99,15 +99,15 @@ public class ProductServiceImpl implements ProductService {
         // ✅ 为每张图片加上 URL 前缀，如果没有图片则返回默认图片
         List<String> imageUrls = images.stream().map(img -> {
             if (img.getImageUrl() != null && !img.getImageUrl().isEmpty()) {
-                return "http://154.36.178.147:15634/" + img.getImageUrl();
+                return "https://fm.stn2h4.top/" + img.getImageUrl();
             } else {
-                return "http://154.36.178.147:15634/defaultProduct.png";
+                return "https://fm.stn2h4.top/defaultProduct.png";
             }
         }).collect(Collectors.toList());
 
         // 如果没有图片，添加默认图片
         if (imageUrls.isEmpty()) {
-            imageUrls.add("http://154.36.178.147:15634/defaultProduct.png");
+            imageUrls.add("https://fm.stn2h4.top/defaultProduct.png");
         }
 
         // 获取卖家信息
@@ -136,9 +136,9 @@ public class ProductServiceImpl implements ProductService {
 
             // ✅ 如果有头像，加上 URL 前缀；否则返回默认头像
             if (seller.getAvatar() != null && !seller.getAvatar().isEmpty()) {
-                sellerInfo.setAvatar("http://154.36.178.147:15634/" + seller.getAvatar());
+                sellerInfo.setAvatar("https://fm.stn2h4.top/" + seller.getAvatar());
             } else {
-                sellerInfo.setAvatar("http://154.36.178.147:15634/defaultProduct.png");
+                sellerInfo.setAvatar("https://fm.stn2h4.top/defaultProduct.png");
             }
 
             sellerInfo.setCampus(seller.getCampus());
@@ -217,9 +217,9 @@ public class ProductServiceImpl implements ProductService {
 
             // ✅ 如果有缩略图，加上 URL 前缀；否则返回默认图片
             if (thumbnail != null && thumbnail.getImageUrl() != null && !thumbnail.getImageUrl().isEmpty()) {
-                item.setThumbnail("http://154.36.178.147:15634/" + thumbnail.getImageUrl());
+                item.setThumbnail("https://fm.stn2h4.top/" + thumbnail.getImageUrl());
             } else {
-                item.setThumbnail("http://154.36.178.147:15634/defaultProduct.png");
+                item.setThumbnail("https://fm.stn2h4.top/defaultProduct.png");
             }
 
             // 获取卖家昵称

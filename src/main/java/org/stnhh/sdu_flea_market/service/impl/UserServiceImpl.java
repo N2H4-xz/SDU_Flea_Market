@@ -110,9 +110,9 @@ public class UserServiceImpl implements UserService {
 
         // ✅ 如果有头像，加上 URL 前缀；否则返回默认头像
         if (user.getAvatar() != null && !user.getAvatar().isEmpty()) {
-            response.setAvatar("http://154.36.178.147:15634/" + user.getAvatar());
+            response.setAvatar("https://fm.stn2h4.top/" + user.getAvatar());
         } else {
-            response.setAvatar("http://154.36.178.147:15634/default.jpg");
+            response.setAvatar("https://fm.stn2h4.top/default.jpg");
         }
 
         response.setNickname(user.getNickname());
