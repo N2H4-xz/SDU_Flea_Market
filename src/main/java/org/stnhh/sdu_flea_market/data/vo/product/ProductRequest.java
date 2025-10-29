@@ -17,5 +17,6 @@ public class ProductRequest {
     private String condition;
     private String campus;
     private MultipartFile[] images; // 商品图片
+    private String[] deletedImages; // 需要删除的图片
 }
 

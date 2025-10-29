@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.stnhh.sdu_flea_market.data.Config;
 import org.stnhh.sdu_flea_market.data.po.Order;
 import org.stnhh.sdu_flea_market.data.po.Product;
 import org.stnhh.sdu_flea_market.data.po.ProductImage;
@@ -159,22 +160,29 @@ public class OrderServiceImpl implements OrderService {
 
         // 更新订单状态
         order.setOrderStatus(newStatus);
+        
+        if("paid".equals(newStatus)) {
+
+        }
+        
+        
         if ("completed".equals(newStatus)) {
-            order.setPaidAt(LocalDateTime.now());
             order.setCompletedAt(LocalDateTime.now());
 
-            // ✅ 卖家接受订单时的处理
-            // 1. 检查买家余额是否充足，如果充足则扣钱
-            userWalletService.deductBalance(order.getBuyerId(), order.getBuyerId(), order.getAmount());
-
-            // 2. 给卖家钱包转钱
-            userWalletService.addBalance(order.getSellerId(), order.getSellerId(), order.getAmount());
+           
 
             // 3. 更新商品状态为已卖出
             Product product = productMapper.selectById(order.getProductId());
             if (product != null) {
                 product.setProductStatus(1); // 1 = sold（已卖出）
                 product.setUpdatedAt(LocalDateTime.now());
+                          order.setPaidAt(LocalDateTime.now());
+            // ✅买家支付订单时的处理
+            // 1. 检查买家余额是否充足，如果充足则扣钱
+            userWalletService.deductBalance(order.getBuyerId(), order.getBuyerId(), order.getAmount());
+            
+            // 2. 给卖家钱包转钱
+            userWalletService.addBalance(order.getSellerId(), order.getSellerId(), order.getAmount());
                 productMapper.updateById(product);
             }
 
@@ -228,13 +236,13 @@ public class OrderServiceImpl implements OrderService {
 
             // ✅ 如果有缩略图，加上 URL 前缀；否则返回默认图片
             if (thumbnail != null && thumbnail.getImageUrl() != null && !thumbnail.getImageUrl().isEmpty()) {
-                response.setProduct_image("http://154.36.178.147:15634/" + thumbnail.getImageUrl());
+                response.setProduct_image( Config.DOMAIN + thumbnail.getImageUrl());
             } else {
-                response.setProduct_image("http://154.36.178.147:15634/defaultProduct.jpg");
+                response.setProduct_image(Config.DOMAIN+"defaultProduct.jpg");
             }
         } else {
             // 商品不存在时，返回默认图片
-            response.setProduct_image("http://154.36.178.147:15634/defaultProduct.jpg");
+            response.setProduct_image(Config.DOMAIN+"defaultProduct.jpg");
         }
 
         return response;

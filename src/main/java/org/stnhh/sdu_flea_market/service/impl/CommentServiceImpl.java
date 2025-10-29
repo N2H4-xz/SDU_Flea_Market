@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.stnhh.sdu_flea_market.data.Config;
 import org.stnhh.sdu_flea_market.data.po.Comment;
 import org.stnhh.sdu_flea_market.data.po.Product;
 import org.stnhh.sdu_flea_market.data.po.User;
@@ -99,9 +100,9 @@ public class CommentServiceImpl implements CommentService {
 
                 // ✅ 如果有头像，加上 URL 前缀；否则返回默认头像
                 if (author.getAvatar() != null && !author.getAvatar().isEmpty()) {
-                    authorInfo.setAvatar("http://154.36.178.147:15634/" + author.getAvatar());
+                    authorInfo.setAvatar( Config.DOMAIN + author.getAvatar());
                 } else {
-                    authorInfo.setAvatar("http://154.36.178.147:15634/default.jpg");
+                    authorInfo.setAvatar(Config.DOMAIN+"default.jpg");
                 }
 
                 response.setAuthor(authorInfo);
