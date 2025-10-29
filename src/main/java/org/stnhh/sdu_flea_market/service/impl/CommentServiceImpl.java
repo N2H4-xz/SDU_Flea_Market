@@ -99,9 +99,9 @@ public class CommentServiceImpl implements CommentService {
 
                 // ✅ 如果有头像，加上 URL 前缀；否则返回默认头像
                 if (author.getAvatar() != null && !author.getAvatar().isEmpty()) {
-                    authorInfo.setAvatar("https://fm.stn2h4.top/" + author.getAvatar());
+                    authorInfo.setAvatar("http://154.36.178.147:15634/" + author.getAvatar());
                 } else {
-                    authorInfo.setAvatar("https://fm.stn2h4.top/default.jpg");
+                    authorInfo.setAvatar("http://154.36.178.147:15634/default.jpg");
                 }
 
                 response.setAuthor(authorInfo);

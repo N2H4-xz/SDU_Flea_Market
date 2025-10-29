@@ -228,13 +228,13 @@ public class OrderServiceImpl implements OrderService {
 
             // ✅ 如果有缩略图，加上 URL 前缀；否则返回默认图片
             if (thumbnail != null && thumbnail.getImageUrl() != null && !thumbnail.getImageUrl().isEmpty()) {
-                response.setProduct_image("https://fm.stn2h4.top/" + thumbnail.getImageUrl());
+                response.setProduct_image("http://154.36.178.147:15634/" + thumbnail.getImageUrl());
             } else {
-                response.setProduct_image("https://fm.stn2h4.top/defaultProduct.jpg");
+                response.setProduct_image("http://154.36.178.147:15634/defaultProduct.jpg");
             }
         } else {
             // 商品不存在时，返回默认图片
-            response.setProduct_image("https://fm.stn2h4.top/defaultProduct.jpg");
+            response.setProduct_image("http://154.36.178.147:15634/defaultProduct.jpg");
         }
 
         return response;
