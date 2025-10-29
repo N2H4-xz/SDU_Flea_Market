@@ -82,7 +82,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse getProductDetail(Long productId) {
         // 查询商品信息
         Product product = productMapper.selectById(productId);
-        if (product == null || product.getIsDeleted()) {
+        if (product == null || product.getIsDeleted() || product.getProductStatus() != 0) {
             throw new ResourceNotFoundException("商品不存在");
         }
 

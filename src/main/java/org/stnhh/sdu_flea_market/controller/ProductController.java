@@ -59,9 +59,10 @@ public class ProductController {
             @RequestParam(required = false) String campus,
             @RequestParam(defaultValue = "newest") String sort,
             @RequestParam(required = false) String condition,
-            @RequestParam(required = false) Long sellerId) {
+            @RequestParam(required = false) Long sellerId,
+            @RequestParam(required = false) Integer status) {
         // 获取商品列表
-        PageResponse<ProductListResponse> response = productService.listProducts(page, limit, keyword, category, campus, sort, condition, sellerId);
+        PageResponse<ProductListResponse> response = productService.listProducts(page, limit, keyword, category, campus, sort, condition, sellerId, status);
         return Result.success(response, "获取成功");
     }
 

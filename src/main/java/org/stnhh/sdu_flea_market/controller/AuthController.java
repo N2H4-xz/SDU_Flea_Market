@@ -40,15 +40,15 @@ public class AuthController {
         return Result.success(response, "登录成功");
     }
 
-    @Auth
-    @PostMapping("/logout")
-    public ResponseEntity<Result> logout() {
-        // 从请求上下文中获取userId（由AuthAspect设置）
-        Long userId = AuthContextUtil.getUserId();
-        // 调用服务进行登出
-        userService.logout(userId);
-        return Result.ok();
-    }
+//    @Auth
+//    @PostMapping("/logout")
+//    public ResponseEntity<Result> logout() {
+//        // 从请求上下文中获取userId（由AuthAspect设置）
+//        Long userId = AuthContextUtil.getUserId();
+//        // 调用服务进行登出
+//        userService.logout(userId);
+//        return Result.ok();
+//    }
 
     @Auth
     @PostMapping("/change-password")

@@ -170,10 +170,10 @@ public class OrderServiceImpl implements OrderService {
             // 2. 给卖家钱包转钱
             userWalletService.addBalance(order.getSellerId(), order.getSellerId(), order.getAmount());
 
-            // 3. 下架商品（设置为删除）
+            // 3. 更新商品状态为已卖出
             Product product = productMapper.selectById(order.getProductId());
             if (product != null) {
-                product.setIsDeleted(true);
+                product.setProductStatus(1); // 1 = sold（已卖出）
                 product.setUpdatedAt(LocalDateTime.now());
                 productMapper.updateById(product);
             }
