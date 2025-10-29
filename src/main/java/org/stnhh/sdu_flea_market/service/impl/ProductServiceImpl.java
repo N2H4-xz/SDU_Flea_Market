@@ -152,10 +152,17 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public PageResponse<ProductListResponse> listProducts(Integer page, Integer limit, String keyword,
-                                                          String category, String campus, String sort, String condition, Long sellerId) {
-        // 构建查询条件：只查询未删除且状态为活跃的商品
+                                                          String category, String campus, String sort, String condition, Long sellerId, Integer status) {
+        // 构建查询条件：只查询未删除的商品
         QueryWrapper<Product> wrapper = new QueryWrapper<>();
-        wrapper.eq("is_deleted", false).eq("product_status", 0);
+        wrapper.eq("is_deleted", false);
+
+        // 如果指定了状态，按状态筛选；否则默认只查询活跃商品
+        if (status != null) {
+            wrapper.eq("product_status", status);
+        } else {
+            wrapper.eq("product_status", 0); // 默认只查询活跃商品
+        }
 
         // 根据关键词搜索商品标题或描述
         if (keyword != null && !keyword.isEmpty()) {
